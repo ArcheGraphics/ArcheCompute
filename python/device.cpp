@@ -6,15 +6,17 @@
 
 #include <pybind11/pybind11.h>
 #include "metal/metal_device.h"
+#include "cuda/cuda_device.h"
 
 namespace py = pybind11;
 
-std::unique_ptr<vox::Device> create_device(const std::string& name) {
+std::unique_ptr<vox::Device> create_device(const std::string &name) {
     if (name == "metal") {
         return std::make_unique<vox::MetalDevice>();
-    } else {
-        return nullptr;
+    } else if (name == "cuda") {
+        return std::make_unique<vox::CUDADevice>();
     }
+    return nullptr;
 }
 
 PYBIND11_MODULE(_core, m) {

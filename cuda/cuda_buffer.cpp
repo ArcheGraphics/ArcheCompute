@@ -4,22 +4,13 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#pragma once
-
-#include <string>
-#include <memory>
+#include "cuda_buffer.h"
 
 namespace vox {
-class Buffer;
+CUDABuffer::CUDABuffer() {
+}
 
-class Device {
-public:
-    Device() = default;
-    virtual ~Device() = default;
-
-    virtual std::string_view name() = 0;
-
-    virtual std::shared_ptr<Buffer> create_buffer() = 0;
-};
+CUDABuffer::~CUDABuffer() {
+}
 
 }// namespace vox

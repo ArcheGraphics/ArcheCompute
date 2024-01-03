@@ -6,20 +6,14 @@
 
 #pragma once
 
-#include <string>
-#include <memory>
+#include "core/buffer.h"
+#include <Metal/Metal.hpp>
 
 namespace vox {
-class Buffer;
-
-class Device {
+class CUDABuffer : public Buffer {
 public:
-    Device() = default;
-    virtual ~Device() = default;
+    CUDABuffer();
 
-    virtual std::string_view name() = 0;
-
-    virtual std::shared_ptr<Buffer> create_buffer() = 0;
+    ~CUDABuffer() override;
 };
-
 }// namespace vox
