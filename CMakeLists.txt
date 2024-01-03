@@ -32,7 +32,6 @@ list(APPEND CMAKE_MODULE_PATH
 include(global_options)
 include(check_atomic)
 
-enable_language(CUDA)
 find_package(CUDAToolkit)
 
 # Add third party libraries
@@ -42,9 +41,11 @@ add_subdirectory(common)
 add_subdirectory(core)
 if (APPLE)
     add_subdirectory(metal)
+    add_compile_definitions()
 endif ()
 
 if (CUDAToolkit_FOUND)
+    enable_language(CUDA)
     include_directories(${CUDA_INCLUDE_DIRS})
     add_subdirectory(cuda)
 endif ()

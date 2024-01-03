@@ -10,13 +10,22 @@
 
 namespace py = pybind11;
 
-std::unique_ptr<vox::Device> create_device(const std::string &name) {
-    if (name == "metal") {
-        return std::make_unique<vox::MetalDevice>();
-    } else if (name == "cuda") {
-        return std::make_unique<vox::CUDADevice>();
+enum class DeviceType {
+    CPU,
+    GPU
+};
+
+std::unique_ptr<vox::Device> create_device(DeviceType type) {
+    switch (type) {
+        case DeviceType::CPU: return nullptr;
+        case DeviceType::GPU: {
+#ifdef __APPLE__
+            return std::make_unique<vox::MetalDevice>();
+#else
+            return std::make_unique<vox::CUDADevice>();
+#endif
+        }
     }
-    return nullptr;
 }
 
 PYBIND11_MODULE(_core, m) {
@@ -32,6 +41,11 @@ PYBIND11_MODULE(_core, m) {
            add
            subtract
     )pbdoc";
+
+    py::enum_<DeviceType>(m, "DeviceType")
+        .value("CPU", DeviceType::CPU)
+        .value("GPU", DeviceType::GPU)
+        .export_values();
 
     m.def("create_device", &create_device);
 
