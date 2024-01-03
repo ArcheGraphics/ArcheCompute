@@ -18,7 +18,7 @@ MetalDevice::~MetalDevice() {
 }
 
 std::string_view MetalDevice::name() {
-    return "";
+    return "metal";
 }
 
 std::shared_ptr<Buffer> MetalDevice::create_buffer() {

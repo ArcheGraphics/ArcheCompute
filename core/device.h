@@ -13,6 +13,8 @@ class Buffer;
 
 class Device {
 public:
+    virtual ~Device() = 0;
+
     virtual std::string_view name() = 0;
 
     virtual std::shared_ptr<Buffer> create_buffer() = 0;

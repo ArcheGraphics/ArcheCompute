@@ -38,5 +38,6 @@ add_subdirectory(third_party)
 add_subdirectory(common)
 add_subdirectory(core)
 add_subdirectory(metal)
+add_subdirectory(python)
 
 add_subdirectory(apps)

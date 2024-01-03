@@ -14,7 +14,7 @@ class MetalDevice : public Device {
 public:
     MetalDevice();
 
-    ~MetalDevice();
+    ~MetalDevice() override;
 
     std::string_view name() override;
 
