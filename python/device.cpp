@@ -9,13 +9,17 @@
 
 namespace py = pybind11;
 
-std::unique_ptr<vox::Device> create_device() {
-    return std::make_unique<vox::MetalDevice>();
+std::unique_ptr<vox::Device> create_device(const std::string& name) {
+    if (name == "metal") {
+        return std::make_unique<vox::MetalDevice>();
+    } else {
+        return nullptr;
+    }
 }
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
-        Pybind11 example plugin
+        ArcheCompute python module
         -----------------------
 
         .. currentmodule:: arche_compute
