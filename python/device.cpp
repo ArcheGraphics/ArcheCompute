@@ -18,7 +18,7 @@ PYBIND11_MODULE(_core, m) {
         Pybind11 example plugin
         -----------------------
 
-        .. currentmodule:: scikit_build_example
+        .. currentmodule:: arche_compute
 
         .. autosummary::
            :toctree: _generate

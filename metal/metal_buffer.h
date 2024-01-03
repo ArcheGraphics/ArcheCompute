@@ -14,7 +14,7 @@ class MetalBuffer : public Buffer {
 public:
     MetalBuffer(MTL::Device *device);
 
-    ~MetalBuffer();
+    ~MetalBuffer() override;
 
 private:
     MTL::Buffer *_buffer{nullptr};

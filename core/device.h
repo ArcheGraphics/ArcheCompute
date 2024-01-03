@@ -13,7 +13,8 @@ class Buffer;
 
 class Device {
 public:
-    virtual ~Device() = 0;
+    Device() = default;
+    virtual ~Device() = default;
 
     virtual std::string_view name() = 0;
 

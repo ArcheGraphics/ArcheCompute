@@ -9,5 +9,7 @@
 namespace vox {
 class Buffer {
 public:
+    Buffer() = default;
+    virtual ~Buffer() = default;
 };
 }// namespace vox

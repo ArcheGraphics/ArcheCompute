@@ -1,5 +1,6 @@
-import scikit_build_example as m
+import arche_compute as compute
 
 
 if __name__ == '__main__':
-    print("aa")
+    device = compute.create_device()
+    print(device.name())
