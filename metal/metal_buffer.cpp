@@ -5,3 +5,15 @@
 //  property of any third parties.
 
 #include "metal_buffer.h"
+
+namespace vox {
+MetalBuffer::MetalBuffer(MTL::Device *device)
+    : _buffer{device->newBuffer(0, MTL::ResourceOptions{})} {
+    _buffer->retain();
+}
+
+MetalBuffer::~MetalBuffer() {
+    _buffer->release();
+}
+
+}// namespace vox

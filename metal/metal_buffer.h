@@ -7,9 +7,16 @@
 #pragma once
 
 #include "core/buffer.h"
+#include <Metal/Metal.hpp>
 
 namespace vox {
 class MetalBuffer : public Buffer {
 public:
+    MetalBuffer(MTL::Device *device);
+
+    ~MetalBuffer();
+
+private:
+    MTL::Buffer *_buffer{nullptr};
 };
 }// namespace vox

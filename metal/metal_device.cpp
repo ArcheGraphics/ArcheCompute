@@ -8,12 +8,21 @@
 #include "metal_buffer.h"
 
 namespace vox {
+MetalDevice::MetalDevice()
+    : _device{MTL::CreateSystemDefaultDevice()} {
+    _device->retain();
+}
+
+MetalDevice::~MetalDevice() {
+    _device->release();
+}
+
 std::string_view MetalDevice::name() {
     return "";
 }
 
 std::shared_ptr<Buffer> MetalDevice::create_buffer() {
-    return std::make_shared<MetalBuffer>();
+    return std::make_shared<MetalBuffer>(_device);
 }
 
 }// namespace vox

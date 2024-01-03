@@ -7,12 +7,20 @@
 #pragma once
 
 #include "core/device.h"
+#include <Metal/Metal.hpp>
 
 namespace vox {
 class MetalDevice : public Device {
 public:
+    MetalDevice();
+
+    ~MetalDevice();
+
     std::string_view name() override;
 
     std::shared_ptr<Buffer> create_buffer() override;
+
+private:
+    MTL::Device *_device{nullptr};
 };
 }// namespace vox
