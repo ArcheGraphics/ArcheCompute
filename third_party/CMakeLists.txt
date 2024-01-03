@@ -11,7 +11,8 @@ add_library(metal-cpp
 
 target_include_directories(metal-cpp PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/metal-cpp"
-        )
+        "${CMAKE_CURRENT_SOURCE_DIR}/metal-cpp-extensions"
+)
 
 target_link_libraries(metal-cpp
         "-framework Metal"
@@ -53,15 +54,3 @@ target_link_libraries(metal-cpp
 ## stb
 #add_library(stb INTERFACE)
 #target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/stb")
-#
-## spdlog
-#add_subdirectory(spdlog)
-#
-## glfw
-#option(GLFW_BUILD_DOCS OFF)
-#option(GLFW_BUILD_TESTS OFF)
-#option(GLFW_BUILD_EXAMPLES OFF)
-#option(GLFW_BUILD_TESTS OFF)
-#option(GLFW_INSTALL OFF)
-#option(BUILD_SHARED_LIBS ON)
-#add_subdirectory(glfw)

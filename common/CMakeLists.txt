@@ -8,6 +8,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(common LANGUAGES C CXX)
 
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+
+
 set(COMMON_FILES
         # Header Files
         helpers.h
@@ -49,7 +53,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ..
 
 # Link third party libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        spdlog
+        fmt::fmt
+        spdlog::spdlog
         metal-cpp
 )
 

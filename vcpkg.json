@@ -1,0 +1,15 @@
+{
+  "name" : "arche-compute",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "52b52b4588b916152ff662f97842e03db83fa5d1",
+  "dependencies" : [ {
+    "name" : "fmt",
+    "version>=" : "10.1.1"
+  }, {
+    "name" : "gtest",
+    "version>=" : "1.14.0"
+  }, {
+    "name" : "spdlog",
+    "version>=" : "1.12.0"
+  } ]
+}

@@ -36,3 +36,4 @@ include(check_atomic)
 add_subdirectory(third_party)
 
 add_subdirectory(common)
+add_subdirectory(apps)
