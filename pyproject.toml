@@ -7,7 +7,7 @@ build-backend = "scikit_build_core.build"
 name = "scikit_build_example"
 version = "0.0.1"
 description="A minimal example package (with pybind11)"
-readme = "../README.md"
+readme = "README.md"
 authors = [
   { name = "My Name", email = "me@email.com" },
 ]
@@ -31,6 +31,8 @@ test = ["pytest"]
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
 
+[tool.scikit-build.cmake.define]
+CMAKE_TOOLCHAIN_FILE = "/Users/yangfeng/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
