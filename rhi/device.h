@@ -12,6 +12,7 @@
 namespace vox {
 class Buffer;
 class Stream;
+class Kernel;
 
 class Device {
 public:
@@ -23,6 +24,8 @@ public:
     virtual std::shared_ptr<Stream> create_stream() = 0;
 
     virtual std::shared_ptr<Buffer> create_buffer() = 0;
+
+    virtual std::shared_ptr<Kernel> create_kernel() = 0;
 };
 
 }// namespace vox

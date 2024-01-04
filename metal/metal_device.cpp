@@ -7,6 +7,7 @@
 #include "metal_device.h"
 #include "metal_buffer.h"
 #include "metal_stream.h"
+#include "metal_kernel.h"
 
 namespace vox {
 MetalDevice::MetalDevice()
@@ -28,6 +29,10 @@ std::shared_ptr<Buffer> MetalDevice::create_buffer() {
 
 std::shared_ptr<Stream> MetalDevice::create_stream() {
     return std::make_shared<MetalStream>(_device);
+}
+
+std::shared_ptr<Kernel> MetalDevice::create_kernel() {
+    return std::make_shared<MetalKernel>(_device);
 }
 
 }// namespace vox

@@ -15,6 +15,8 @@ set(COMMON_FILES
         metal_stream.cpp
         metal_buffer.h
         metal_buffer.cpp
+        metal_kernel.h
+        metal_kernel.cpp
 )
 
 source_group("common\\" FILES ${COMMON_FILES})

@@ -12,6 +12,8 @@ set(COMMON_FILES
         device.h
         stream.h
         buffer.h
+        kernel.h
+        argument.h
 )
 
 source_group("common\\" FILES ${COMMON_FILES})

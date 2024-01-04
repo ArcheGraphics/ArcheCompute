@@ -18,6 +18,12 @@ public:
 
     void submit() override;
 
+    void dispatch_thread_groups(
+        std::shared_ptr<Kernel> kernel,
+        std::array<uint32_t, 3> thread_groups_per_grid,
+        std::array<uint32_t, 3> threads_per_thread_group,
+        const std::vector<Argument> &args) override;
+
 private:
     MTL::CommandQueue *_queue{nullptr};
 };
