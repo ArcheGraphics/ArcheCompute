@@ -19,12 +19,5 @@ set(PROJECT_FILES
         ${COMMON_FILES}
 )
 
-add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES})
-set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../)
-
-# Link third party libraries
-target_link_libraries(${PROJECT_NAME} PUBLIC
-        common
-)
+add_library(${PROJECT_NAME} INTERFACE ${PROJECT_FILES})
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} ../)

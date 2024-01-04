@@ -34,12 +34,11 @@ include(check_atomic)
 
 find_package(CUDAToolkit)
 
-# Add third party libraries
-add_subdirectory(third_party)
-
 add_subdirectory(common)
-add_subdirectory(core)
+add_subdirectory(rhi)
 if (APPLE)
+    # Add third party libraries
+    add_subdirectory(third_party)
     add_subdirectory(metal)
     add_compile_definitions()
 endif ()
@@ -52,4 +51,6 @@ endif ()
 
 add_subdirectory(python)
 
-add_subdirectory(apps)
+if (APPLE)
+    add_subdirectory(apps)
+endif ()

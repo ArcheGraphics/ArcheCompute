@@ -5,8 +5,11 @@
 //  property of any third parties.
 
 #include <pybind11/pybind11.h>
+#ifdef __APPLE__
 #include "metal/metal_device.h"
+#else
 #include "cuda/cuda_device.h"
+#endif
 
 namespace py = pybind11;
 

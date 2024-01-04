@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include "core/buffer.h"
-#include <Metal/Metal.hpp>
+#include "rhi/buffer.h"
 
 namespace vox {
 class CUDABuffer : public Buffer {

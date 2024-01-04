@@ -17,13 +17,9 @@ set(COMMON_FILES
         helpers.h
         logging.h
         timer.h
-        filesystem.h
-        utils.h
         # Source Files
         logging.cpp
         timer.cpp
-        filesystem.cpp
-        utils.cpp
 )
 
 source_group("common\\" FILES ${COMMON_FILES})
@@ -55,7 +51,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ..
 target_link_libraries(${PROJECT_NAME} PUBLIC
         fmt::fmt
         spdlog::spdlog
-        metal-cpp
 )
 
 if (${NEED_LINK_ATOMIC})

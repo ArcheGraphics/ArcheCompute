@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "core/device.h"
+#include "rhi/device.h"
 #include <Metal/Metal.hpp>
 
 namespace vox {
