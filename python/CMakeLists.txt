@@ -29,5 +29,8 @@ target_include_directories(_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../)
 # This is passing in the version as a define just as an example
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
+set_property(TARGET _core PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 # The install directory is the output (wheel) directory
 install(TARGETS _core DESTINATION arche_compute)

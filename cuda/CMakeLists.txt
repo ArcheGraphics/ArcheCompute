@@ -21,12 +21,18 @@ set(PROJECT_FILES
         ${COMMON_FILES}
 )
 
-add_library(${PROJECT_NAME} OBJECT ${PROJECT_FILES})
+add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_property(TARGET ${PROJECT_NAME} PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../)
 
 # Link third party libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
         rhi
+        CUDA::cudart_static
+        CUDA::nvrtc_static
+        CUDA::nvrtc_builtins_static
+        CUDA::nvptxcompiler_static
 )

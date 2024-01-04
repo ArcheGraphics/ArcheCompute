@@ -7,7 +7,18 @@
 #include "cuda_device.h"
 #include "cuda_buffer.h"
 
+#include <nvrtc.h>
+#include <nvPTXCompiler.h>
+#include <cudaTypedefs.h>
+#include <cuda_runtime_api.h>
+
 namespace vox {
+void *alloc_device(void *context, size_t s) {
+    void *ptr;
+    cudaMalloc(&ptr, s);
+    return ptr;
+}
+
 CUDADevice::CUDADevice() {
 }
 
