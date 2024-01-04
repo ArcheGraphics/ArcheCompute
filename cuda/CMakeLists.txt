@@ -11,6 +11,8 @@ project(cuda LANGUAGES C CXX CUDA)
 set(COMMON_FILES
         cuda_device.h
         cuda_device.cpp
+        cuda_stream.h
+        cuda_stream.cpp
         cuda_buffer.h
         cuda_buffer.cpp
 )

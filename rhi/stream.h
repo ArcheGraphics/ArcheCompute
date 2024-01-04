@@ -10,19 +10,11 @@
 #include <memory>
 
 namespace vox {
-class Buffer;
-class Stream;
-
-class Device {
+class Stream {
 public:
-    Device() = default;
-    virtual ~Device() = default;
+    virtual ~Stream() = default;
 
-    virtual std::string_view name() = 0;
-
-    virtual std::shared_ptr<Stream> create_stream() = 0;
-
-    virtual std::shared_ptr<Buffer> create_buffer() = 0;
+    virtual void submit() = 0;
 };
 
 }// namespace vox

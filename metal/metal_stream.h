@@ -6,23 +6,19 @@
 
 #pragma once
 
-#include "rhi/device.h"
+#include "rhi/stream.h"
 #include <Metal/Metal.hpp>
 
 namespace vox {
-class MetalDevice : public Device {
+class MetalStream : public Stream {
 public:
-    MetalDevice();
+    MetalStream(MTL::Device *device);
 
-    ~MetalDevice() override;
+    ~MetalStream() override;
 
-    std::string_view name() override;
-
-    std::shared_ptr<Buffer> create_buffer() override;
-
-    std::shared_ptr<Stream> create_stream() override;
+    void submit() override;
 
 private:
-    MTL::Device *_device{nullptr};
+    MTL::CommandQueue *_queue{nullptr};
 };
 }// namespace vox

@@ -6,6 +6,7 @@
 
 #include "metal_device.h"
 #include "metal_buffer.h"
+#include "metal_stream.h"
 
 namespace vox {
 MetalDevice::MetalDevice()
@@ -23,6 +24,10 @@ std::string_view MetalDevice::name() {
 
 std::shared_ptr<Buffer> MetalDevice::create_buffer() {
     return std::make_shared<MetalBuffer>(_device);
+}
+
+std::shared_ptr<Stream> MetalDevice::create_stream() {
+    return std::make_shared<MetalStream>(_device);
 }
 
 }// namespace vox

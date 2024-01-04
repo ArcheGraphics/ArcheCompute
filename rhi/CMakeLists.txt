@@ -10,6 +10,7 @@ project(rhi LANGUAGES C CXX)
 
 set(COMMON_FILES
         device.h
+        stream.h
         buffer.h
 )
 

@@ -11,6 +11,8 @@ project(metal LANGUAGES C CXX)
 set(COMMON_FILES
         metal_device.h
         metal_device.cpp
+        metal_stream.h
+        metal_stream.cpp
         metal_buffer.h
         metal_buffer.cpp
 )
