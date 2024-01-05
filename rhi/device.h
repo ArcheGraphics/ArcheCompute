@@ -24,7 +24,7 @@ public:
 
     virtual std::shared_ptr<Stream> create_stream() = 0;
 
-    virtual std::shared_ptr<Buffer> create_buffer(size_t size) = 0;
+    virtual std::shared_ptr<Buffer> create_buffer(size_t element_stride, size_t size) = 0;
 
     virtual std::shared_ptr<Kernel> create_kernel(const std::string &code, const std::string &entry) = 0;
 };

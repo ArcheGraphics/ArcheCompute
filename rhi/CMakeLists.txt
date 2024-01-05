@@ -12,8 +12,10 @@ set(COMMON_FILES
         device.h
         stream.h
         buffer.h
+        buffer.cpp
         kernel.h
         argument.h
+        command.h
 )
 
 set(EXTENSION_FILES
@@ -26,5 +28,5 @@ set(PROJECT_FILES
         ${EXTENSION_FILES}
 )
 
-add_library(${PROJECT_NAME} INTERFACE ${PROJECT_FILES})
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} ../)
+add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ../)

@@ -28,8 +28,8 @@ std::unique_ptr<MetalDebugCaptureExt> MetalDevice::debug_capture() {
     return std::make_unique<MetalDebugCaptureExt>(_device);
 }
 
-std::shared_ptr<Buffer> MetalDevice::create_buffer(size_t size) {
-    return std::make_shared<MetalBuffer>(_device, size);
+std::shared_ptr<Buffer> MetalDevice::create_buffer(size_t element_stride, size_t size) {
+    return std::make_shared<MetalBuffer>(_device, element_stride, size);
 }
 
 std::shared_ptr<Stream> MetalDevice::create_stream() {

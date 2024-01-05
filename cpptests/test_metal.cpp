@@ -31,7 +31,7 @@ TEST(Metal, Base) {
             args.buffer[0] = 10.0;
         })";
 
-    auto buffer = device->create_buffer(10 * sizeof(float));
+    auto buffer = device->create_buffer(sizeof(float), 10);
     auto kernel = device->create_kernel(kernelSrc, "kernel_main");
 
     capture_scope->start_debug_capture();

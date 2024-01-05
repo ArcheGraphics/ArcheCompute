@@ -22,7 +22,7 @@ public:
 
     std::unique_ptr<MetalDebugCaptureExt> debug_capture();
 
-    std::shared_ptr<Buffer> create_buffer(size_t size) override;
+    std::shared_ptr<Buffer> create_buffer(size_t element_stride, size_t size) override;
 
     std::shared_ptr<Stream> create_stream() override;
 

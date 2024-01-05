@@ -12,7 +12,7 @@
 namespace vox {
 class MetalBuffer : public Buffer {
 public:
-    MetalBuffer(MTL::Device *device, size_t size);
+    MetalBuffer(MTL::Device *device, size_t element_stride, size_t size);
 
     ~MetalBuffer() override;
 
