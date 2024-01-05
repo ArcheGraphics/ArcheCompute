@@ -50,6 +50,7 @@ if (CUDAToolkit_FOUND)
 endif ()
 
 add_subdirectory(python)
+add_subdirectory(cpptests)
 
 if (APPLE)
     add_subdirectory(apps)

@@ -24,8 +24,8 @@ std::string_view MetalDevice::name() {
     return _device->name()->utf8String();
 }
 
-std::shared_ptr<Buffer> MetalDevice::create_buffer() {
-    return std::make_shared<MetalBuffer>(_device);
+std::shared_ptr<Buffer> MetalDevice::create_buffer(size_t size) {
+    return std::make_shared<MetalBuffer>(_device, size);
 }
 
 std::shared_ptr<Stream> MetalDevice::create_stream() {

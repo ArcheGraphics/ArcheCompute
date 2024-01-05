@@ -46,8 +46,8 @@ void MetalStream::dispatch_thread_groups(
             if constexpr (std::is_same_v<T, UniformArgument>) {
                 copy(arg.data(), arg.size());
             } else if constexpr (std::is_same_v<T, BufferArgument>) {
-                auto metal_buffer = std::static_pointer_cast<MetalBuffer>(arg.buffer);
-                auto binding = metal_buffer->binding(arg.offset);
+                auto metal_buffer = std::static_pointer_cast<MetalBuffer>(arg);
+                auto binding = metal_buffer->address();
                 copy(&binding, sizeof(binding));
             }
         },

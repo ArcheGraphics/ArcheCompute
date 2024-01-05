@@ -11,10 +11,7 @@
 #include "buffer.h"
 
 namespace vox {
-struct BufferArgument {
-    std::shared_ptr<Buffer> buffer;
-    size_t offset;
-};
+using BufferArgument = std::shared_ptr<Buffer>;
 
 using UniformArgument = std::vector<uint8_t>;
 

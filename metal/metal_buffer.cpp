@@ -7,8 +7,9 @@
 #include "metal_buffer.h"
 
 namespace vox {
-MetalBuffer::MetalBuffer(MTL::Device *device)
-    : _buffer{device->newBuffer(0, MTL::ResourceOptions{})} {
+MetalBuffer::MetalBuffer(MTL::Device *device, size_t size)
+    : _buffer{device->newBuffer(size, MTL::ResourceStorageModePrivate |
+                                          MTL::ResourceHazardTrackingModeTracked)} {
     _buffer->retain();
 }
 
@@ -16,8 +17,8 @@ MetalBuffer::~MetalBuffer() {
     _buffer->release();
 }
 
-MetalBuffer::Binding MetalBuffer::binding(size_t offset) const noexcept {
-    return {_buffer->gpuAddress() + offset};
+uint64_t MetalBuffer::address() const noexcept {
+    return _buffer->gpuAddress();
 }
 
 }// namespace vox
