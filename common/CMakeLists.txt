@@ -17,9 +17,15 @@ set(COMMON_FILES
         helpers.h
         logging.h
         timer.h
+        first_fit.h
+        pool.h
+        spin_mutex.h
+        thread_safety.h
         # Source Files
         logging.cpp
         timer.cpp
+        first_fit.cpp
+        pool.cpp
 )
 
 source_group("common\\" FILES ${COMMON_FILES})

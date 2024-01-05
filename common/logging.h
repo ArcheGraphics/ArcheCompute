@@ -6,76 +6,111 @@
 
 #pragma once
 
-#include <spdlog/fmt/fmt.h>
-#include <spdlog/spdlog.h>
-
-#define LOGGER_FORMAT "[%^%l%$] %v"
-#define PROJECT_NAME "Arche-cpp"
-
-// Mainly for IDEs
-#ifndef ROOT_PATH_SIZE
-#define ROOT_PATH_SIZE 0
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
 #endif
 
-#define __FILENAME__ (static_cast<const char *>(__FILE__) + ROOT_PATH_SIZE)
+#include <spdlog/spdlog.h>
 
-#define LOGI(...) spdlog::info(__VA_ARGS__);
-#define LOGW(...) spdlog::warn(__VA_ARGS__);
-#define LOGE(...) spdlog::error("[{}:{}] {}", __FILENAME__, __LINE__, fmt::format(__VA_ARGS__));
-#define LOGD(...) spdlog::debug(__VA_ARGS__);
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
-class Logger;
+#include <functional>
+#include <fmt/format.h>
 
-// Returns the logger that discards all messages.
-Logger &get_null_logger();
+namespace vox {
 
-// Returns the logger that writes messages to std::clog.
-Logger &get_error_logger();
+using log_level = spdlog::level::level_enum;
 
-// A simple logger that writes messages to an output stream if not null.
-//
-// This logger uses standard I/O so it should only be used in binaries.
-class Logger {
-public:
-    friend Logger &get_null_logger();
-    friend Logger &get_error_logger();
+namespace detail {
+[[nodiscard]] spdlog::logger &default_logger() noexcept;
+void set_sink(spdlog::sink_ptr sink) noexcept;
+spdlog::sink_ptr create_sink_with_callback(
+    std::function<void(const char *level,
+                       const char *message)>
+        callback) noexcept;
+}// namespace detail
 
-    template<class T>
-    Logger &operator<<(const T &content);
-
-    // Disable copy construction and assignment
-    Logger(const Logger &) = delete;
-    Logger &operator=(const Logger &) = delete;
-
-private:
-    enum class Type {
-        NONE,
-        ERROR,
-    };
-    Type type_;
-    explicit Logger(Type type) : type_(type) {}
-};
-
-template<class T>
-Logger &Logger::operator<<(const T &content) {
-    switch (type_) {
-        case Type::NONE:
-            break;
-        case Type::ERROR:
-            spdlog::error(content);
-            break;
-    }
-    return *this;
+template<typename... Args>
+inline void log_verbose(Args &&...args) noexcept {
+    detail::default_logger().debug(std::forward<Args>(args)...);
 }
 
+template<typename... Args>
+inline void log_info(Args &&...args) noexcept {
+    detail::default_logger().info(std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+inline void log_warning(Args &&...args) noexcept {
+    detail::default_logger().warn(std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+[[noreturn]] void log_error(Args &&...args) noexcept {
+    auto error_message = fmt::format(std::forward<Args>(args)...);
+    detail::default_logger().error("{}", error_message);
+    std::abort();
+}
+
+/// Set log level as verbose
+void log_level_verbose() noexcept;
+/// Set log level as info
+void log_level_info() noexcept;
+/// Set log level as warning
+void log_level_warning() noexcept;
+/// Set log level as error
+void log_level_error() noexcept;
+
+/// flush the logs
+void log_flush() noexcept;
+
+}// namespace vox
+
+/**
+ * @brief Verbose logging
+ * 
+ * Ex. VERBOSE("function {} returns {}", functionName, functionReturnInt);
+ */
+#define VERBOSE(fmt, ...) \
+    ::vox::log_verbose(FMT_STRING(fmt) __VA_OPT__(, ) __VA_ARGS__)
+/**
+ * @brief Info logging
+ * 
+ * Ex. INFO("function {} returns {}", functionName, functionReturnInt);
+ */
+#define INFO(fmt, ...) \
+    ::vox::log_info(FMT_STRING(fmt) __VA_OPT__(, ) __VA_ARGS__)
+/**
+ * @brief Warning logging
+ * 
+ * Ex. WARNING("function {} returns {}", functionName, functionReturnInt);
+ */
+#define WARNING(fmt, ...) \
+    ::vox::log_warning(FMT_STRING(fmt) __VA_OPT__(, ) __VA_ARGS__)
+/**
+ * @brief Error logging
+ * 
+ * After logging error message, the program will be aborted.
+ * Ex. ERROR("function {} returns {}", functionName, functionReturnInt);
+ */
+#define ERROR(fmt, ...) \
+    ::vox::log_error(FMT_STRING(fmt) __VA_OPT__(, ) __VA_ARGS__)
+
+/// VERBOSE with file and line information
 #define VERBOSE_WITH_LOCATION(fmt, ...) \
-    LOGD(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
+    VERBOSE(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
+/// INFO with file and line information
 #define INFO_WITH_LOCATION(fmt, ...) \
-    LOGI(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
+    INFO(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
+/// WARNING with file and line information
 #define WARNING_WITH_LOCATION(fmt, ...) \
-    LOGW(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
+    WARNING(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
+/// ERROR with file and line information
 #define ERROR_WITH_LOCATION(fmt, ...) \
-    LOGE(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
+    ERROR(fmt " [{}:{}]" __VA_OPT__(, ) __VA_ARGS__, __FILE__, __LINE__)
 
 #define NOT_IMPLEMENTED() \
     ERROR_WITH_LOCATION("Not implemented.")

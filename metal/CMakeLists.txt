@@ -13,12 +13,17 @@ set(COMMON_FILES
         metal_device.cpp
         metal_stream.h
         metal_stream.cpp
+        metal_stream_objc.mm
         metal_buffer.h
         metal_buffer.cpp
         metal_kernel.h
         metal_kernel.cpp
         metal_command_encoder.h
         metal_command_encoder.cpp
+        metal_stage_buffer_pool.h
+        metal_stage_buffer_pool.cpp
+        metal_callback_context.h
+        metal_callback_context.cpp
 )
 
 set(EXTENSION_FILES

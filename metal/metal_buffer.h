@@ -18,6 +18,10 @@ public:
 
     [[nodiscard]] uint64_t address() const noexcept;
 
+    [[nodiscard]] inline MTL::Buffer *handle() const {
+        return _buffer;
+    }
+
 private:
     MTL::Buffer *_buffer{nullptr};
 };

@@ -23,7 +23,7 @@ public:
 
     virtual void synchronize() = 0;
 
-    virtual void submit(std::vector<std::unique_ptr<Command>> commands) = 0;
+    virtual void dispatch(std::vector<std::unique_ptr<Command>> commands) = 0;
 };
 
 }// namespace vox
