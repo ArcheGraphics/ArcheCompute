@@ -17,7 +17,7 @@ MetalKernel::MetalKernel(MTL::Device *device, const std::string &code, const std
         assert(false);
     }
 
-    MTL::Function *pMandelbrotFn = pComputeLibrary->newFunction(NS::String::string("mandelbrot_set", NS::UTF8StringEncoding));
+    MTL::Function *pMandelbrotFn = pComputeLibrary->newFunction(NS::String::string(entry.c_str(), NS::UTF8StringEncoding));
     _pso = NS::TransferPtr(device->newComputePipelineState(pMandelbrotFn, &pError));
     if (!_pso) {
         __builtin_printf("%s", pError->localizedDescription()->utf8String());

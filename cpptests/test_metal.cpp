@@ -12,7 +12,23 @@ TEST(Metal, Base) {
     auto device = std::make_unique<vox::MetalDevice>();
     auto stream = device->create_stream();
 
-    auto buffer = device->create_buffer(10);
-    auto kernel = device->create_kernel("", "main");
-    stream->dispatch_thread_groups(kernel, {1, 1, 1}, {1, 1, 1}, {});
+    const char *kernelSrc = R"(
+        #include <metal_stdlib>
+        using namespace metal;
+
+        struct alignas(16) Arguments {
+            device float* buffer;
+        };
+
+
+        kernel void kernel_main(constant Arguments &args,
+                                uint2 index [[thread_position_in_grid]],
+                                uint2 gridSize [[threads_per_grid]])
+        {
+            args.buffer[0] = 10.0;
+        })";
+
+    auto buffer = device->create_buffer(10 * sizeof(float));
+    auto kernel = device->create_kernel(kernelSrc, "kernel_main");
+    stream->dispatch_thread_groups(kernel, {1, 1, 1}, {1, 1, 1}, {buffer});
 }

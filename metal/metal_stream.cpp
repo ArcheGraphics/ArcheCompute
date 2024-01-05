@@ -61,6 +61,7 @@ void MetalStream::dispatch_thread_groups(
     compute_encoder->setBytes(argument_buffer.data(), argument_offset, 0u);
     compute_encoder->dispatchThreadgroups(MTL::Size{thread_groups_per_grid[0], thread_groups_per_grid[1], thread_groups_per_grid[2]},
                                           MTL::Size{threads_per_thread_group[0], threads_per_thread_group[1], threads_per_thread_group[2]});
+    compute_encoder->endEncoding();
     cb->commit();
 }
 
