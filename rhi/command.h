@@ -17,7 +17,6 @@ class Buffer;
     BufferUploadCommand,            \
         BufferDownloadCommand,      \
         BufferCopyCommand,          \
-        BufferToTextureCopyCommand, \
         CustomCommand
 
 #define MAKE_COMMAND_FWD_DECL(CMD) class CMD;

@@ -7,6 +7,7 @@
 #include "metal_stream.h"
 #include "metal_kernel.h"
 #include "metal_buffer.h"
+#include "metal_command_encoder.h"
 
 namespace vox {
 MetalStream::MetalStream(MTL::Device *device)
@@ -70,4 +71,10 @@ void MetalStream::synchronize() {
     command_buffer->commit();
     command_buffer->waitUntilCompleted();
 }
+
+void MetalStream::submit(std::vector<std::unique_ptr<Command>> commands) {
+    MetalCommandEncoder encoder{this};
+    for (auto &command : commands) { command->accept(encoder); }
+}
+
 }// namespace vox

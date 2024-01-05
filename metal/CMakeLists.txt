@@ -17,6 +17,8 @@ set(COMMON_FILES
         metal_buffer.cpp
         metal_kernel.h
         metal_kernel.cpp
+        metal_command_encoder.h
+        metal_command_encoder.cpp
 )
 
 set(EXTENSION_FILES

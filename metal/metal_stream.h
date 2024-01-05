@@ -24,6 +24,8 @@ public:
         std::array<uint32_t, 3> threads_per_thread_group,
         const std::vector<Argument> &args) override;
 
+    void submit(std::vector<std::unique_ptr<Command>> commands) override;
+
     inline MTL::CommandQueue *queue() {
         return _queue;
     }

@@ -22,6 +22,8 @@ public:
         const std::vector<Argument> &args) = 0;
 
     virtual void synchronize() = 0;
+
+    virtual void submit(std::vector<std::unique_ptr<Command>> commands) = 0;
 };
 
 }// namespace vox
