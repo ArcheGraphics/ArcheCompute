@@ -14,7 +14,6 @@ namespace vox {
 struct BufferArgument {
     std::shared_ptr<Buffer> buffer;
     size_t offset;
-    size_t size;
 };
 
 using UniformArgument = std::vector<uint8_t>;

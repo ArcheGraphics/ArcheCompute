@@ -13,6 +13,7 @@ namespace vox {
 MetalDevice::MetalDevice()
     : _device{MTL::CreateSystemDefaultDevice()} {
     _device->retain();
+
 }
 
 MetalDevice::~MetalDevice() {
@@ -20,7 +21,7 @@ MetalDevice::~MetalDevice() {
 }
 
 std::string_view MetalDevice::name() {
-    return "metal";
+    return _device->name()->utf8String();
 }
 
 std::shared_ptr<Buffer> MetalDevice::create_buffer() {
@@ -31,8 +32,8 @@ std::shared_ptr<Stream> MetalDevice::create_stream() {
     return std::make_shared<MetalStream>(_device);
 }
 
-std::shared_ptr<Kernel> MetalDevice::create_kernel() {
-    return std::make_shared<MetalKernel>(_device);
+std::shared_ptr<Kernel> MetalDevice::create_kernel(const std::string &code, const std::string &entry) {
+    return std::make_shared<MetalKernel>(_device, code, entry);
 }
 
 }// namespace vox

@@ -12,11 +12,13 @@
 namespace vox {
 class MetalKernel : public Kernel {
 public:
-    MetalKernel(MTL::Device *device);
+    MetalKernel(MTL::Device *device, const std::string &code, const std::string &entry);
 
-    ~MetalKernel() override;
+    [[nodiscard]] inline const NS::SharedPtr<MTL::ComputePipelineState>& pso() const {
+        return _pso;
+    }
 
 private:
-    MTL::ComputePipelineState *_pso{nullptr};
+    NS::SharedPtr<MTL::ComputePipelineState> _pso;
 };
 }// namespace vox

@@ -16,4 +16,8 @@ MetalBuffer::~MetalBuffer() {
     _buffer->release();
 }
 
+MetalBuffer::Binding MetalBuffer::binding(size_t offset) const noexcept {
+    return {_buffer->gpuAddress() + offset};
+}
+
 }// namespace vox

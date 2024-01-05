@@ -12,7 +12,7 @@
 namespace vox {
 class MetalStream : public Stream {
 public:
-    MetalStream(MTL::Device *device);
+    explicit MetalStream(MTL::Device *device);
 
     ~MetalStream() override;
 

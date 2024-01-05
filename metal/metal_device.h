@@ -22,7 +22,7 @@ public:
 
     std::shared_ptr<Stream> create_stream() override;
 
-    std::shared_ptr<Kernel> create_kernel() override;
+    std::shared_ptr<Kernel> create_kernel(const std::string &code, const std::string &entry) override;
 
 private:
     MTL::Device *_device{nullptr};

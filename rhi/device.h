@@ -25,7 +25,7 @@ public:
 
     virtual std::shared_ptr<Buffer> create_buffer() = 0;
 
-    virtual std::shared_ptr<Kernel> create_kernel() = 0;
+    virtual std::shared_ptr<Kernel> create_kernel(const std::string &code, const std::string &entry) = 0;
 };
 
 }// namespace vox
