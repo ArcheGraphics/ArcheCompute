@@ -61,24 +61,24 @@ PYBIND11_MODULE(_core, m) {
         .def("create_buffer", &vox::Device::create_buffer)
         .def("create_kernel", &vox::Device::create_kernel);
 
-    py::class_<vox::Buffer>(m, "Buffer")
+    py::class_<vox::Buffer, std::shared_ptr<vox::Buffer>>(m, "Buffer")
         .def(py::init<>());
 
-    py::class_<vox::Kernel>(m, "Kernel")
+    py::class_<vox::Kernel, std::shared_ptr<vox::Kernel>>(m, "Kernel")
         .def(py::init<>());
 
-    py::class_<vox::Stream>(m, "Stream")
+    py::class_<vox::Stream, std::shared_ptr<vox::Stream>>(m, "Stream")
         .def("synchronize", &vox::Stream::synchronize)
         .def("dispatch_thread_groups", &vox::Stream::dispatch_thread_groups);
 
 #ifdef __APPLE__
-    py::class_<vox::MetalBuffer, vox::Buffer>(m, "MetalBuffer")
+    py::class_<vox::MetalBuffer, vox::Buffer, std::shared_ptr<vox::MetalBuffer>>(m, "MetalBuffer")
         .def(py::init<MTL::Device *, size_t>());
 
-    py::class_<vox::MetalKernel, vox::Kernel>(m, "MetalKernel")
+    py::class_<vox::MetalKernel, vox::Kernel, std::shared_ptr<vox::MetalKernel>>(m, "MetalKernel")
         .def(py::init<MTL::Device *, const std::string &, const std::string &>());
 
-    py::class_<vox::MetalStream, vox::Stream>(m, "MetalStream")
+    py::class_<vox::MetalStream, vox::Stream, std::shared_ptr<vox::MetalStream>>(m, "MetalStream")
         .def(py::init<MTL::Device *>());
 #endif
 }
