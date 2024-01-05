@@ -18,6 +18,8 @@ public:
 
     std::string_view name() override;
 
+    std::unique_ptr<DeviceExtension> extension(std::string_view name) override;
+
     std::shared_ptr<Buffer> create_buffer(size_t size) override;
 
     std::shared_ptr<Stream> create_stream() override;

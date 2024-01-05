@@ -8,12 +8,12 @@
 #include "metal_buffer.h"
 #include "metal_stream.h"
 #include "metal_kernel.h"
+#include "extension/metal_debug_capture_ext.h"
 
 namespace vox {
 MetalDevice::MetalDevice()
     : _device{MTL::CreateSystemDefaultDevice()} {
     _device->retain();
-
 }
 
 MetalDevice::~MetalDevice() {
@@ -22,6 +22,13 @@ MetalDevice::~MetalDevice() {
 
 std::string_view MetalDevice::name() {
     return _device->name()->utf8String();
+}
+
+std::unique_ptr<DeviceExtension> MetalDevice::extension(std::string_view name) {
+    if (name == DebugCaptureExt::name) {
+        return std::make_unique<MetalDebugCaptureExt>();
+    }
+    return nullptr;
 }
 
 std::shared_ptr<Buffer> MetalDevice::create_buffer(size_t size) {

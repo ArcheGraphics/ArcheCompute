@@ -16,10 +16,14 @@ set(COMMON_FILES
         argument.h
 )
 
-source_group("common\\" FILES ${COMMON_FILES})
+set(EXTENSION_FILES
+        extension/device_extension.h
+        extension/debug_capture_ext.h
+)
 
 set(PROJECT_FILES
         ${COMMON_FILES}
+        ${EXTENSION_FILES}
 )
 
 add_library(${PROJECT_NAME} INTERFACE ${PROJECT_FILES})

@@ -13,6 +13,7 @@ namespace vox {
 class Buffer;
 class Stream;
 class Kernel;
+class DeviceExtension;
 
 class Device {
 public:
@@ -20,6 +21,8 @@ public:
     virtual ~Device() = default;
 
     virtual std::string_view name() = 0;
+
+    virtual std::unique_ptr<DeviceExtension> extension(std::string_view name) = 0;
 
     virtual std::shared_ptr<Stream> create_stream() = 0;
 

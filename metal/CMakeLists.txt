@@ -19,10 +19,14 @@ set(COMMON_FILES
         metal_kernel.cpp
 )
 
-source_group("common\\" FILES ${COMMON_FILES})
+set(EXTENSION_FILES
+        extension/metal_debug_capture_ext.h
+        extension/metal_debug_capture_ext.cpp
+)
 
 set(PROJECT_FILES
         ${COMMON_FILES}
+        ${EXTENSION_FILES}
 )
 
 add_library(${PROJECT_NAME} OBJECT ${PROJECT_FILES})
