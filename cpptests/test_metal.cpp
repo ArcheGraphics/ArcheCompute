@@ -7,10 +7,14 @@
 #include <gtest/gtest.h>
 #include "metal/metal_device.h"
 #include "metal/metal_stream.h"
+#include "metal/extension/metal_debug_capture_ext.h"
 
 TEST(Metal, Base) {
     auto device = std::make_unique<vox::MetalDevice>();
     auto stream = device->create_stream();
+    auto capture = device->extension(vox::DebugCaptureExt::name);
+    auto metal_capture = dynamic_cast<vox::DebugCaptureExt *>(capture.get());
+    auto capture_scope = metal_capture->create_scope("arche-capture");
 
     const char *kernelSrc = R"(
         #include <metal_stdlib>
@@ -30,6 +34,9 @@ TEST(Metal, Base) {
 
     auto buffer = device->create_buffer(10 * sizeof(float));
     auto kernel = device->create_kernel(kernelSrc, "kernel_main");
+
+    capture_scope->mark_begin();
     stream->dispatch_thread_groups(kernel, {1, 1, 1}, {1, 1, 1}, {buffer});
     stream->synchronize();
+    capture_scope->mark_end();
 }

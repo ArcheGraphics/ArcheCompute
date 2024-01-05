@@ -26,7 +26,7 @@ std::string_view MetalDevice::name() {
 
 std::unique_ptr<DeviceExtension> MetalDevice::extension(std::string_view name) {
     if (name == DebugCaptureExt::name) {
-        return std::make_unique<MetalDebugCaptureExt>();
+        return std::make_unique<MetalDebugCaptureExt>(_device);
     }
     return nullptr;
 }
