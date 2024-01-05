@@ -65,6 +65,9 @@ void MetalStream::dispatch_thread_groups(
     cb->commit();
 }
 
-void MetalStream::submit() {
+void MetalStream::synchronize() {
+    auto command_buffer = _queue->commandBufferWithUnretainedReferences();
+    command_buffer->commit();
+    command_buffer->waitUntilCompleted();
 }
 }// namespace vox

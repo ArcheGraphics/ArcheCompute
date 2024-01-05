@@ -16,7 +16,7 @@ public:
 
     ~MetalStream() override;
 
-    void submit() override;
+    void synchronize() override;
 
     void dispatch_thread_groups(
         std::shared_ptr<Kernel> kernel,

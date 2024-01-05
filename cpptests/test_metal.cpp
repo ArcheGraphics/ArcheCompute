@@ -31,4 +31,5 @@ TEST(Metal, Base) {
     auto buffer = device->create_buffer(10 * sizeof(float));
     auto kernel = device->create_kernel(kernelSrc, "kernel_main");
     stream->dispatch_thread_groups(kernel, {1, 1, 1}, {1, 1, 1}, {buffer});
+    stream->synchronize();
 }
