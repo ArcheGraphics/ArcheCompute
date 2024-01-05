@@ -36,11 +36,11 @@ public:
     ~MetalDebugCaptureExt() noexcept override;
 
     [[nodiscard]] std::unique_ptr<DebugCaptureScope> create_scope(
-        std::string_view label, const DebugCaptureOption &option) const noexcept override;
+        std::string_view label, const DebugCaptureOption &option = {}) const noexcept override;
 
     [[nodiscard]] std::unique_ptr<DebugCaptureScope> create_scope(
         const std::shared_ptr<Stream> &stream_handle,
-        std::string_view label, const DebugCaptureOption &option) const noexcept override;
+        std::string_view label, const DebugCaptureOption &option = {}) const noexcept override;
 
 private:
     MTL::Device *_device;

@@ -10,6 +10,7 @@
 #include "metal/metal_stream.h"
 #include "metal/metal_buffer.h"
 #include "metal/metal_kernel.h"
+#include "metal/extension/metal_debug_capture_ext.h"
 #else
 #include "cuda/cuda_device.h"
 #endif
@@ -71,7 +72,34 @@ PYBIND11_MODULE(_core, m) {
         .def("synchronize", &vox::Stream::synchronize)
         .def("dispatch_thread_groups", &vox::Stream::dispatch_thread_groups);
 
+    py::class_<vox::DebugCaptureExt>(m, "DebugCaptureExt")
+        .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::DebugCaptureExt::*)(std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with device")
+        .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::DebugCaptureExt::*)(const std::shared_ptr<vox::Stream> &, std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with stream");
+
+    py::class_<vox::DebugCaptureScope>(m, "DebugCaptureScope")
+        .def("start_debug_capture", &vox::DebugCaptureScope::start_debug_capture)
+        .def("stop_debug_capture", &vox::DebugCaptureScope::stop_debug_capture)
+        .def("mark_begin", &vox::DebugCaptureScope::mark_begin)
+        .def("mark_end", &vox::DebugCaptureScope::mark_end);
+
+    py::enum_<vox::DebugCaptureOption::Output>(m, "DebugCaptureOptionOutput")
+        .value("DEVELOPER_TOOLS", vox::DebugCaptureOption::Output::DEVELOPER_TOOLS)
+        .value("GPU_TRACE_DOCUMENT", vox::DebugCaptureOption::Output::GPU_TRACE_DOCUMENT)
+        .export_values();
+
+    py::class_<vox::DebugCaptureOption>(m, "DebugCaptureOption")
+        .def(py::init<>())
+        .def_readwrite("output", &vox::DebugCaptureOption::output)
+        .def_readwrite("file_name", &vox::DebugCaptureOption::file_name);
+
 #ifdef __APPLE__
+    py::class_<vox::MetalDevice, vox::Device>(m, "MetalDevice")
+        .def("name", &vox::MetalDevice::name)
+        .def("create_stream", &vox::MetalDevice::create_stream)
+        .def("create_buffer", &vox::MetalDevice::create_buffer)
+        .def("create_kernel", &vox::MetalDevice::create_kernel)
+        .def("debug_capture", &vox::MetalDevice::debug_capture);
+
     py::class_<vox::MetalBuffer, vox::Buffer, std::shared_ptr<vox::MetalBuffer>>(m, "MetalBuffer")
         .def(py::init<MTL::Device *, size_t>());
 
@@ -80,5 +108,16 @@ PYBIND11_MODULE(_core, m) {
 
     py::class_<vox::MetalStream, vox::Stream, std::shared_ptr<vox::MetalStream>>(m, "MetalStream")
         .def(py::init<MTL::Device *>());
+
+    py::class_<vox::MetalDebugCaptureExt, vox::DebugCaptureExt>(m, "MetalDebugCaptureExt")
+        .def(py::init<MTL::Device *>())
+        .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::MetalDebugCaptureExt::*)(std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with device")
+        .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::MetalDebugCaptureExt::*)(const std::shared_ptr<vox::Stream> &, std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with stream");
+
+    py::class_<vox::MetalDebugCaptureScope, vox::DebugCaptureScope>(m, "MetalDebugCaptureScope")
+        .def("start_debug_capture", &vox::MetalDebugCaptureScope::start_debug_capture)
+        .def("stop_debug_capture", &vox::MetalDebugCaptureScope::stop_debug_capture)
+        .def("mark_begin", &vox::MetalDebugCaptureScope::mark_begin)
+        .def("mark_end", &vox::MetalDebugCaptureScope::mark_end);
 #endif
 }

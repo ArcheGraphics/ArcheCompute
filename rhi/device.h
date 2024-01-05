@@ -22,8 +22,6 @@ public:
 
     virtual std::string_view name() = 0;
 
-    virtual std::unique_ptr<DeviceExtension> extension(std::string_view name) = 0;
-
     virtual std::shared_ptr<Stream> create_stream() = 0;
 
     virtual std::shared_ptr<Buffer> create_buffer(size_t size) = 0;

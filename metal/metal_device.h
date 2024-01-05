@@ -10,6 +10,8 @@
 #include <Metal/Metal.hpp>
 
 namespace vox {
+class MetalDebugCaptureExt;
+
 class MetalDevice : public Device {
 public:
     MetalDevice();
@@ -18,7 +20,7 @@ public:
 
     std::string_view name() override;
 
-    std::unique_ptr<DeviceExtension> extension(std::string_view name) override;
+    std::unique_ptr<MetalDebugCaptureExt> debug_capture();
 
     std::shared_ptr<Buffer> create_buffer(size_t size) override;
 

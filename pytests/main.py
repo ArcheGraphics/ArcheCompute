@@ -6,6 +6,8 @@ if __name__ == '__main__':
 
     stream = device.create_stream()
     buffer = device.create_buffer(40)
+    capture = device.debug_capture()
+    capture_scope = capture.create_scope("arche-capture", DebugCaptureOption())
 
     kernelSrc = '''
     #include <metal_stdlib>
@@ -24,4 +26,7 @@ if __name__ == '__main__':
         }
     '''
     kernel = device.create_kernel(kernelSrc, "kernel_main")
+
+    capture_scope.start_debug_capture()
     stream.synchronize()
+    capture_scope.stop_debug_capture()

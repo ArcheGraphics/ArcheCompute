@@ -24,11 +24,8 @@ std::string_view MetalDevice::name() {
     return _device->name()->utf8String();
 }
 
-std::unique_ptr<DeviceExtension> MetalDevice::extension(std::string_view name) {
-    if (name == DebugCaptureExt::name) {
-        return std::make_unique<MetalDebugCaptureExt>(_device);
-    }
-    return nullptr;
+std::unique_ptr<MetalDebugCaptureExt> MetalDevice::debug_capture() {
+    return std::make_unique<MetalDebugCaptureExt>(_device);
 }
 
 std::shared_ptr<Buffer> MetalDevice::create_buffer(size_t size) {
