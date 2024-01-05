@@ -28,5 +28,7 @@ if __name__ == '__main__':
     kernel = device.create_kernel(kernelSrc, "kernel_main")
 
     capture_scope.start_debug_capture()
+    capture_scope.mark_begin()
     stream.synchronize()
+    capture_scope.mark_end()
     capture_scope.stop_debug_capture()
