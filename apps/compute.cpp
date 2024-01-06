@@ -443,7 +443,7 @@ void Renderer::buildShaders() {
     NS::Error *pError = nullptr;
     MTL::Library *pLibrary = _pDevice->newLibrary(NS::String::string(shaderSrc, UTF8StringEncoding), nullptr, &pError);
     if (!pLibrary) {
-        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
         assert(false);
     }
 
@@ -458,7 +458,7 @@ void Renderer::buildShaders() {
 
     _pPSO = _pDevice->newRenderPipelineState(pDesc, &pError);
     if (!_pPSO) {
-        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
         assert(false);
     }
 
@@ -503,14 +503,14 @@ void Renderer::buildComputePipeline() {
 
     MTL::Library *pComputeLibrary = _pDevice->newLibrary(NS::String::string(kernelSrc, NS::UTF8StringEncoding), nullptr, &pError);
     if (!pComputeLibrary) {
-        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
         assert(false);
     }
 
     MTL::Function *pMandelbrotFn = pComputeLibrary->newFunction(NS::String::string("mandelbrot_set", NS::UTF8StringEncoding));
     _pComputePSO = _pDevice->newComputePipelineState(pMandelbrotFn, &pError);
     if (!_pComputePSO) {
-        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
         assert(false);
     }
 

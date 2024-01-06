@@ -5,6 +5,8 @@
 //  property of any third parties.
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
 #ifdef __APPLE__
 #include "metal/metal_device.h"
 #include "metal/metal_stream.h"
@@ -74,10 +76,16 @@ PYBIND11_MODULE(_core, m) {
             .def(py::init<std::shared_ptr<const vox::Kernel>, std::array<uint32_t, 3>, std::array<uint32_t, 3>, const std::vector<vox::Argument> &>());
     }
 
-    py::class_<vox::Buffer, std::shared_ptr<vox::Buffer>>(m, "Buffer")
-        .def("copy_to", &vox::Buffer::copy_to)
-        .def("copy_from", static_cast<std::shared_ptr<vox::BufferCopyCommand> (vox::Buffer::*)(const vox::BufferView &) const noexcept>(&vox::Buffer::copy_from), "copy from gpu buffer")
-        .def("copy_from", static_cast<std::shared_ptr<vox::BufferUploadCommand> (vox::Buffer::*)(const void *) const noexcept>(&vox::Buffer::copy_from), "copy from cpu buffer");
+    py::class_<vox::Buffer, std::shared_ptr<vox::Buffer>>(m, "Buffer", py::buffer_protocol())
+        .def("copy_to", [](const vox::Buffer* self, const py::buffer& compressed_data) {
+            py::buffer_info in_inf = compressed_data.request();
+            return self->copy_to(in_inf.ptr);
+        })
+        .def("copy_from", [](const vox::Buffer* self, const py::buffer& compressed_data) {
+            py::buffer_info in_inf = compressed_data.request();
+            return self->copy_from(in_inf.ptr);
+        })
+        .def("copy_from", static_cast<std::shared_ptr<vox::BufferCopyCommand> (vox::Buffer::*)(const vox::BufferView &) const noexcept>(&vox::Buffer::copy_from), "copy from gpu buffer");
 
     py::class_<vox::Kernel, std::shared_ptr<vox::Kernel>>(m, "Kernel")
         .def("launch_thread_groups", &vox::Kernel::launch_thread_groups);

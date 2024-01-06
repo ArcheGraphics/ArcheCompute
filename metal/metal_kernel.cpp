@@ -16,14 +16,14 @@ MetalKernel::MetalKernel(MTL::Device *device, const std::string &code, const std
 
     MTL::Library *pComputeLibrary = device->newLibrary(NS::String::string(code.c_str(), NS::UTF8StringEncoding), nullptr, &pError);
     if (!pComputeLibrary) {
-        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
         assert(false);
     }
 
     MTL::Function *pMandelbrotFn = pComputeLibrary->newFunction(NS::String::string(entry.c_str(), NS::UTF8StringEncoding));
     _pso = NS::TransferPtr(device->newComputePipelineState(pMandelbrotFn, &pError));
     if (!_pso) {
-        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
         assert(false);
     }
 

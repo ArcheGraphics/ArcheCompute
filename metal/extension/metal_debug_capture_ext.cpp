@@ -91,7 +91,7 @@ void MetalDebugCaptureScope::start_debug_capture() const noexcept {
     NS::Error *error = nullptr;
     manager->startCapture(_descriptor, &error);
     if (error) {
-        __builtin_printf("Failed to start debug capture: %s", error->localizedDescription()->utf8String());
+        __builtin_printf("Failed to start debug capture: %s\n", error->localizedDescription()->utf8String());
     }
 }
 
