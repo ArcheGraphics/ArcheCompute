@@ -169,9 +169,39 @@ uint32_t to_u32(T value) {
 }
 
 template<typename T>
-inline std::vector<std::byte> to_bytes(const T &value) {
-    return std::vector<std::byte>{reinterpret_cast<const std::byte *>(&value),
-                                  reinterpret_cast<const std::byte *>(&value) + sizeof(T)};
+std::vector<std::byte> to_bytes(const T &object) {
+    std::vector<std::byte> bytes(sizeof(T));
+
+    const auto *begin = reinterpret_cast<const std::byte *>(std::addressof(object));
+    const std::byte *end = begin + sizeof(T);
+    std::copy(begin, end, bytes.begin());
+
+    return bytes;
+}
+
+template<typename T>
+std::vector<std::byte> to_bytes(const std::vector<T> &object) {
+    std::vector<std::byte> bytes(sizeof(T) * object.size());
+
+    const auto *begin = reinterpret_cast<const std::byte *>(object.data());
+    const std::byte *end = begin + sizeof(T) * object.size();
+    std::copy(begin, end, bytes.begin());
+
+    return bytes;
+}
+
+template<typename T>
+void from_bytes(const std::vector<std::byte> &bytes, T &object) {
+    static_assert(std::is_trivially_copyable<T>::value, "not a TriviallyCopyable type");
+
+    auto *begin_object = reinterpret_cast<std::byte *>(std::addressof(object));
+    std::copy(bytes.begin(), bytes.end(), begin_object);
+}
+
+template<typename T>
+void from_bytes(const std::vector<std::byte> &bytes, std::vector<T> &object) {
+    auto *begin_object = reinterpret_cast<std::byte *>(object.data());
+    std::copy(bytes.begin(), bytes.end(), begin_object);
 }
 
 [[nodiscard]] inline auto align(size_t s, size_t a) noexcept {

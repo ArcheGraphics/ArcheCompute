@@ -45,9 +45,19 @@ TEST(Metal, Base) {
     std::vector<std::unique_ptr<vox::Command>> commands;
     commands.emplace_back(buffer->copy_from(bytes_data.data()));
     commands.emplace_back(kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}));
+    commands.emplace_back(buffer->copy_to(bytes_data.data()));
     stream->dispatch(std::move(commands));
     stream->synchronize();
 
     capture_scope->mark_end();
     capture_scope->stop_debug_capture();
+
+    vox::from_bytes(bytes_data, data);
+    for (int i = 0; i < 10; ++i) {
+        if (i == 0) {
+            EXPECT_EQ(data[i], 10);
+        } else {
+            EXPECT_EQ(data[i], i + 1);
+        }
+    }
 }
