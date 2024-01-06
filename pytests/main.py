@@ -5,7 +5,7 @@ if __name__ == '__main__':
     print(device.name())
 
     stream = device.create_stream()
-    buffer = device.create_buffer(40)
+    buffer = device.create_buffer(4, 10)
     capture = device.debug_capture()
     capture_scope = capture.create_scope("arche-capture", DebugCaptureOption())
 

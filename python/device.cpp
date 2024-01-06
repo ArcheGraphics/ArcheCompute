@@ -62,6 +62,18 @@ PYBIND11_MODULE(_core, m) {
         .def("create_buffer", &vox::Device::create_buffer)
         .def("create_kernel", &vox::Device::create_kernel);
 
+    py::class_<vox::Command, std::shared_ptr<vox::Command>> give_me_a_name(m, "Command");
+    {
+        py::class_<vox::BufferDownloadCommand, vox::Command, std::shared_ptr<vox::BufferDownloadCommand>>(m, "BufferDownloadCommand")
+            .def(py::init<std::shared_ptr<const vox::Buffer>, size_t, size_t, void *>());
+        py::class_<vox::BufferUploadCommand, vox::Command, std::shared_ptr<vox::BufferUploadCommand>>(m, "BufferUploadCommand")
+            .def(py::init<std::shared_ptr<const vox::Buffer>, size_t, size_t, const void *>());
+        py::class_<vox::BufferCopyCommand, vox::Command, std::shared_ptr<vox::BufferCopyCommand>>(m, "BufferCopyCommand")
+            .def(py::init<std::shared_ptr<const vox::Buffer>, std::shared_ptr<const vox::Buffer>, size_t, size_t, size_t>());
+        py::class_<vox::ShaderDispatchCommand, vox::Command, std::shared_ptr<vox::ShaderDispatchCommand>>(m, "ShaderDispatchCommand")
+            .def(py::init<std::shared_ptr<const vox::Kernel>, std::array<uint32_t, 3>, std::array<uint32_t, 3>, const std::vector<vox::Argument> &>());
+    }
+
     py::class_<vox::Buffer, std::shared_ptr<vox::Buffer>>(m, "Buffer")
         .def("copy_to", &vox::Buffer::copy_to)
         .def("copy_from", static_cast<std::shared_ptr<vox::BufferCopyCommand> (vox::Buffer::*)(const vox::BufferView &) const noexcept>(&vox::Buffer::copy_from), "copy from gpu buffer")
@@ -71,27 +83,31 @@ PYBIND11_MODULE(_core, m) {
         .def("launch_thread_groups", &vox::Kernel::launch_thread_groups);
 
     py::class_<vox::Stream, std::shared_ptr<vox::Stream>>(m, "Stream")
-        .def("synchronize", &vox::Stream::synchronize);
+        .def("synchronize", &vox::Stream::synchronize)
+        .def("dispatch", &vox::Stream::dispatch);
 
-    py::class_<vox::DebugCaptureExt>(m, "DebugCaptureExt")
-        .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::DebugCaptureExt::*)(std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with device")
-        .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::DebugCaptureExt::*)(const std::shared_ptr<vox::Stream> &, std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with stream");
+    // debug capture
+    {
+        py::class_<vox::DebugCaptureExt>(m, "DebugCaptureExt")
+            .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::DebugCaptureExt::*)(std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with device")
+            .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::DebugCaptureExt::*)(const std::shared_ptr<vox::Stream> &, std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with stream");
 
-    py::class_<vox::DebugCaptureScope>(m, "DebugCaptureScope")
-        .def("start_debug_capture", &vox::DebugCaptureScope::start_debug_capture)
-        .def("stop_debug_capture", &vox::DebugCaptureScope::stop_debug_capture)
-        .def("mark_begin", &vox::DebugCaptureScope::mark_begin)
-        .def("mark_end", &vox::DebugCaptureScope::mark_end);
+        py::class_<vox::DebugCaptureScope>(m, "DebugCaptureScope")
+            .def("start_debug_capture", &vox::DebugCaptureScope::start_debug_capture)
+            .def("stop_debug_capture", &vox::DebugCaptureScope::stop_debug_capture)
+            .def("mark_begin", &vox::DebugCaptureScope::mark_begin)
+            .def("mark_end", &vox::DebugCaptureScope::mark_end);
 
-    py::enum_<vox::DebugCaptureOption::Output>(m, "DebugCaptureOptionOutput")
-        .value("DEVELOPER_TOOLS", vox::DebugCaptureOption::Output::DEVELOPER_TOOLS)
-        .value("GPU_TRACE_DOCUMENT", vox::DebugCaptureOption::Output::GPU_TRACE_DOCUMENT)
-        .export_values();
+        py::enum_<vox::DebugCaptureOption::Output>(m, "DebugCaptureOptionOutput")
+            .value("DEVELOPER_TOOLS", vox::DebugCaptureOption::Output::DEVELOPER_TOOLS)
+            .value("GPU_TRACE_DOCUMENT", vox::DebugCaptureOption::Output::GPU_TRACE_DOCUMENT)
+            .export_values();
 
-    py::class_<vox::DebugCaptureOption>(m, "DebugCaptureOption")
-        .def(py::init<>())
-        .def_readwrite("output", &vox::DebugCaptureOption::output)
-        .def_readwrite("file_name", &vox::DebugCaptureOption::file_name);
+        py::class_<vox::DebugCaptureOption>(m, "DebugCaptureOption")
+            .def(py::init<>())
+            .def_readwrite("output", &vox::DebugCaptureOption::output)
+            .def_readwrite("file_name", &vox::DebugCaptureOption::file_name);
+    }
 
 #ifdef __APPLE__
     py::class_<vox::MetalDevice, vox::Device>(m, "MetalDevice")
