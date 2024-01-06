@@ -9,7 +9,6 @@
 #include <string>
 #include "argument.h"
 #include "kernel.h"
-#include "command_list.h"
 
 namespace vox {
 class Stream {
@@ -18,7 +17,7 @@ public:
 
     virtual void synchronize() = 0;
 
-    virtual void dispatch(CommandList &&commandList) = 0;
+    virtual void dispatch(const std::vector<std::shared_ptr<Command>> &commands) = 0;
 };
 
 }// namespace vox

@@ -63,14 +63,15 @@ PYBIND11_MODULE(_core, m) {
         .def("create_kernel", &vox::Device::create_kernel);
 
     py::class_<vox::Buffer, std::shared_ptr<vox::Buffer>>(m, "Buffer")
-        .def(py::init<>());
+        .def("copy_to", &vox::Buffer::copy_to)
+        .def("copy_from", static_cast<std::shared_ptr<vox::BufferCopyCommand> (vox::Buffer::*)(const vox::BufferView &) const noexcept>(&vox::Buffer::copy_from), "copy from gpu buffer")
+        .def("copy_from", static_cast<std::shared_ptr<vox::BufferUploadCommand> (vox::Buffer::*)(const void *) const noexcept>(&vox::Buffer::copy_from), "copy from cpu buffer");
 
     py::class_<vox::Kernel, std::shared_ptr<vox::Kernel>>(m, "Kernel")
-        .def(py::init<>());
+        .def("launch_thread_groups", &vox::Kernel::launch_thread_groups);
 
     py::class_<vox::Stream, std::shared_ptr<vox::Stream>>(m, "Stream")
-        .def("synchronize", &vox::Stream::synchronize)
-        .def("dispatch_thread_groups", &vox::Stream::dispatch_thread_groups);
+        .def("synchronize", &vox::Stream::synchronize);
 
     py::class_<vox::DebugCaptureExt>(m, "DebugCaptureExt")
         .def("create_scope", static_cast<std::unique_ptr<vox::DebugCaptureScope> (vox::DebugCaptureExt::*)(std::string_view, const vox::DebugCaptureOption &) const noexcept>(&vox::MetalDebugCaptureExt::create_scope), "create with device")
@@ -101,7 +102,7 @@ PYBIND11_MODULE(_core, m) {
         .def("debug_capture", &vox::MetalDevice::debug_capture);
 
     py::class_<vox::MetalBuffer, vox::Buffer, std::shared_ptr<vox::MetalBuffer>>(m, "MetalBuffer")
-        .def(py::init<MTL::Device *, size_t>());
+        .def(py::init<MTL::Device *, size_t, size_t>());
 
     py::class_<vox::MetalKernel, vox::Kernel, std::shared_ptr<vox::MetalKernel>>(m, "MetalKernel")
         .def(py::init<MTL::Device *, const std::string &, const std::string &>());

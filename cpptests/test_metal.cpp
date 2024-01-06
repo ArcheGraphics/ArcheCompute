@@ -5,7 +5,6 @@
 //  property of any third parties.
 
 #include <gtest/gtest.h>
-#include "rhi/command_list.h"
 #include "metal/metal_device.h"
 #include "metal/metal_buffer.h"
 #include "metal/metal_stream.h"
@@ -34,24 +33,19 @@ TEST(Metal, Base) {
             args.buffer[0] = 10.0;
         })";
 
+    std::vector<float> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    auto bytes_data = vox::to_bytes(data);
     auto buffer = device->create_buffer(sizeof(float), 10);
     auto kernel = device->create_kernel(kernelSrc, "kernel_main");
 
     capture_scope->start_debug_capture();
     capture_scope->mark_begin();
-
-    std::vector<float> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    auto bytes_data = vox::to_bytes(data);
-
-    vox::CommandList commandList;
-    commandList
-        .append(buffer->copy_from(bytes_data.data()))
-        .append(kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}))
-        .append(buffer->copy_to(bytes_data.data()));
-
-    stream->dispatch(std::move(commandList));
-    stream->synchronize();
-
+    {
+        stream->dispatch({buffer->copy_from(bytes_data.data()),
+                          kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}),
+                          buffer->copy_to(bytes_data.data())});
+        stream->synchronize();
+    }
     capture_scope->mark_end();
     capture_scope->stop_debug_capture();
 

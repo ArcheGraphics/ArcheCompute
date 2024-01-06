@@ -31,11 +31,11 @@ MetalKernel::MetalKernel(MTL::Device *device, const std::string &code, const std
     pComputeLibrary->release();
 }
 
-std::unique_ptr<ShaderDispatchCommand> MetalKernel::launch_thread_groups(
+std::shared_ptr<ShaderDispatchCommand> MetalKernel::launch_thread_groups(
     std::array<uint32_t, 3> thread_groups_per_grid,
     std::array<uint32_t, 3> threads_per_thread_group,
-    std::vector<Argument> &&args) {
-    return std::make_unique<ShaderDispatchCommand>(shared_from_this(), thread_groups_per_grid, threads_per_thread_group, std::move(args));
+    const std::vector<Argument> &args) {
+    return std::make_shared<ShaderDispatchCommand>(shared_from_this(), thread_groups_per_grid, threads_per_thread_group, args);
 }
 
 void MetalKernel::launch(MetalCommandEncoder &encoder, const ShaderDispatchCommand *command) const noexcept {

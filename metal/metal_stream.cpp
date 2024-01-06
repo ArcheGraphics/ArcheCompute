@@ -48,8 +48,7 @@ void MetalStream::synchronize() {
     command_buffer->waitUntilCompleted();
 }
 
-void MetalStream::dispatch(CommandList &&commandList) {
-    auto commands = commandList.commands();
+void MetalStream::dispatch(const std::vector<std::shared_ptr<Command>> &commands) {
     MetalCommandEncoder encoder{this};
     for (auto &command : commands) { command->accept(encoder); }
     encoder.submit();

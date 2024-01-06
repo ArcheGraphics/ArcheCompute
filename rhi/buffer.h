@@ -21,13 +21,13 @@ public:
 
     // commands
     // copy buffer's data to pointer
-    [[nodiscard]] std::unique_ptr<BufferDownloadCommand> copy_to(void *data) const noexcept;
+    [[nodiscard]] std::shared_ptr<BufferDownloadCommand> copy_to(void *data) const noexcept;
 
     // copy pointer's data to buffer
-    [[nodiscard]] std::unique_ptr<BufferUploadCommand> copy_from(const void *data) noexcept;
+    [[nodiscard]] std::shared_ptr<BufferUploadCommand> copy_from(const void *data) noexcept;
 
     // copy source buffer's data to buffer
-    [[nodiscard]] std::unique_ptr<BufferCopyCommand> copy_from(const BufferView &source) noexcept;
+    [[nodiscard]] std::shared_ptr<BufferCopyCommand> copy_from(const BufferView &source) noexcept;
 
 private:
     const std::shared_ptr<const Buffer> _handle;
@@ -47,13 +47,13 @@ public:
     [[nodiscard]] BufferView view(size_t offset, size_t count) const noexcept;
 
     // copy buffer's data to pointer
-    [[nodiscard]] std::unique_ptr<BufferDownloadCommand> copy_to(void *data) const noexcept;
+    [[nodiscard]] std::shared_ptr<BufferDownloadCommand> copy_to(void *data) const noexcept;
 
     // copy pointer's data to buffer
-    [[nodiscard]] std::unique_ptr<BufferUploadCommand> copy_from(const void *data) const noexcept;
+    [[nodiscard]] std::shared_ptr<BufferUploadCommand> copy_from(const void *data) const noexcept;
 
     // copy source buffer's data to buffer
-    [[nodiscard]] std::unique_ptr<BufferCopyCommand> copy_from(const BufferView &source) const noexcept;
+    [[nodiscard]] std::shared_ptr<BufferCopyCommand> copy_from(const BufferView &source) const noexcept;
 
 private:
     size_t _size_elements{};

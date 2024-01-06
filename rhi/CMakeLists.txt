@@ -16,8 +16,6 @@ set(COMMON_FILES
         kernel.h
         argument.h
         command.h
-        command_list.h
-        command_list.cpp
 )
 
 set(EXTENSION_FILES

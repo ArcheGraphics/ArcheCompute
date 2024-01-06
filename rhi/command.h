@@ -114,9 +114,9 @@ public:
     ShaderDispatchCommand(std::shared_ptr<const Kernel> shader_handle,
                           std::array<uint32_t, 3> thread_groups_per_grid,
                           std::array<uint32_t, 3> threads_per_thread_group,
-                          std::vector<Argument> &&argument_buffer) noexcept
+                          const std::vector<Argument> &argument_buffer) noexcept
         : _handle{std::move(shader_handle)},
-          _argument_buffer{std::move(argument_buffer)},
+          _argument_buffer{argument_buffer},
           _thread_groups_per_grid{thread_groups_per_grid},
           _threads_per_thread_group{threads_per_thread_group} {}
 

@@ -19,16 +19,16 @@ size_t BufferView::offset_bytes() const noexcept { return _offset_bytes; }
 
 size_t BufferView::size_bytes() const noexcept { return _size_elements * _handle->stride(); }
 
-std::unique_ptr<BufferDownloadCommand> BufferView::copy_to(void *data) const noexcept {
-    return std::make_unique<BufferDownloadCommand>(_handle, offset_bytes(), size_bytes(), data);
+std::shared_ptr<BufferDownloadCommand> BufferView::copy_to(void *data) const noexcept {
+    return std::make_shared<BufferDownloadCommand>(_handle, offset_bytes(), size_bytes(), data);
 }
 
-std::unique_ptr<BufferUploadCommand> BufferView::copy_from(const void *data) noexcept {
-    return std::make_unique<BufferUploadCommand>(_handle, offset_bytes(), size_bytes(), data);
+std::shared_ptr<BufferUploadCommand> BufferView::copy_from(const void *data) noexcept {
+    return std::make_shared<BufferUploadCommand>(_handle, offset_bytes(), size_bytes(), data);
 }
 
-std::unique_ptr<BufferCopyCommand> BufferView::copy_from(const BufferView &source) noexcept {
-    return std::make_unique<BufferCopyCommand>(
+std::shared_ptr<BufferCopyCommand> BufferView::copy_from(const BufferView &source) noexcept {
+    return std::make_shared<BufferCopyCommand>(
         source._handle, _handle,
         source.offset_bytes(), offset_bytes(),
         size_bytes());
@@ -53,15 +53,15 @@ BufferView Buffer::view(size_t offset, size_t count) const noexcept {
     return view().subview(offset, count);
 }
 
-std::unique_ptr<BufferDownloadCommand> Buffer::copy_to(void *data) const noexcept {
+std::shared_ptr<BufferDownloadCommand> Buffer::copy_to(void *data) const noexcept {
     return this->view().copy_to(data);
 }
 
-std::unique_ptr<BufferUploadCommand> Buffer::copy_from(const void *data) const noexcept {
+std::shared_ptr<BufferUploadCommand> Buffer::copy_from(const void *data) const noexcept {
     return this->view().copy_from(data);
 }
 
-std::unique_ptr<BufferCopyCommand> Buffer::copy_from(const BufferView &source) const noexcept {
+std::shared_ptr<BufferCopyCommand> Buffer::copy_from(const BufferView &source) const noexcept {
     return this->view().copy_from(source);
 }
 
