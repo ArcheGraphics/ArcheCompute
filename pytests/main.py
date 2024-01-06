@@ -28,7 +28,7 @@ if __name__ == '__main__':
     '''
     kernel = device.create_kernel(kernelSrc, "kernel_main")
 
-    array = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+    array = np.array([1, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], dtype=np.float32)
 
     capture_scope.start_debug_capture()
     capture_scope.mark_begin()

@@ -6,6 +6,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include "common/logging.h"
 
 #ifdef __APPLE__
 #include "metal/metal_device.h"
@@ -77,12 +78,14 @@ PYBIND11_MODULE(_core, m) {
     }
 
     py::class_<vox::Buffer, std::shared_ptr<vox::Buffer>>(m, "Buffer", py::buffer_protocol())
-        .def("copy_to", [](const vox::Buffer* self, const py::buffer& compressed_data) {
+        .def("copy_to", [](const vox::Buffer *self, const py::buffer &compressed_data) {
             py::buffer_info in_inf = compressed_data.request();
+            ASSERT(in_inf.itemsize == self->stride(), "data stride size mismatch");
             return self->copy_to(in_inf.ptr);
         })
-        .def("copy_from", [](const vox::Buffer* self, const py::buffer& compressed_data) {
+        .def("copy_from", [](const vox::Buffer *self, const py::buffer &compressed_data) {
             py::buffer_info in_inf = compressed_data.request();
+            ASSERT(in_inf.itemsize == self->stride(), "data stride size mismatch");
             return self->copy_from(in_inf.ptr);
         })
         .def("copy_from", static_cast<std::shared_ptr<vox::BufferCopyCommand> (vox::Buffer::*)(const vox::BufferView &) const noexcept>(&vox::Buffer::copy_from), "copy from gpu buffer");

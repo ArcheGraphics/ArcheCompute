@@ -9,8 +9,8 @@
 namespace vox {
 MetalBuffer::MetalBuffer(MTL::Device *device, size_t element_stride, size_t size)
     : Buffer{element_stride, size},
-      _buffer{device->newBuffer(size, MTL::ResourceStorageModePrivate |
-                                          MTL::ResourceHazardTrackingModeTracked)} {
+      _buffer{device->newBuffer(size_bytes(), MTL::ResourceStorageModePrivate |
+                                                  MTL::ResourceHazardTrackingModeTracked)} {
     _buffer->retain();
 }
 
