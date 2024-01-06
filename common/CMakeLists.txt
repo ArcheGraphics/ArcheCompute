@@ -8,10 +8,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(common LANGUAGES C CXX)
 
-find_package(fmt CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-
-
 set(COMMON_FILES
         # Header Files
         helpers.h

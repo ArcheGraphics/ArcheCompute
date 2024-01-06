@@ -5,7 +5,7 @@
 //  property of any third parties.
 
 #include <gtest/gtest.h>
-#include "rhi/command.h"
+#include "rhi/command_list.h"
 #include "metal/metal_device.h"
 #include "metal/metal_buffer.h"
 #include "metal/metal_stream.h"
@@ -42,11 +42,14 @@ TEST(Metal, Base) {
 
     std::vector<float> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     auto bytes_data = vox::to_bytes(data);
-    std::vector<std::unique_ptr<vox::Command>> commands;
-    commands.emplace_back(buffer->copy_from(bytes_data.data()));
-    commands.emplace_back(kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}));
-    commands.emplace_back(buffer->copy_to(bytes_data.data()));
-    stream->dispatch(std::move(commands));
+
+    vox::CommandList commandList;
+    commandList
+        .append(buffer->copy_from(bytes_data.data()))
+        .append(kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}))
+        .append(buffer->copy_to(bytes_data.data()));
+
+    stream->dispatch(std::move(commandList));
     stream->synchronize();
 
     capture_scope->mark_end();

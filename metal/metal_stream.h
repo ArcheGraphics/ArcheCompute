@@ -28,7 +28,7 @@ public:
 
     [[nodiscard]] MetalStageBufferPool *download_pool() noexcept;
 
-    void dispatch(std::vector<std::unique_ptr<Command>> commands) override;
+    void dispatch(CommandList &&commandList) override;
 
     inline MTL::CommandQueue *queue() {
         return _queue;

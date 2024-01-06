@@ -32,6 +32,8 @@ list(APPEND CMAKE_MODULE_PATH
 include(global_options)
 include(check_atomic)
 
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 find_package(CUDAToolkit)
 
 add_subdirectory(common)
