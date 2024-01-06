@@ -10,6 +10,7 @@
 #include "metal/metal_buffer.h"
 #include "metal/metal_stream.h"
 #include "metal/extension/metal_debug_capture_ext.h"
+#include "common/helpers.h"
 
 TEST(Metal, Base) {
     auto device = std::make_unique<vox::MetalDevice>();
@@ -39,9 +40,10 @@ TEST(Metal, Base) {
     capture_scope->start_debug_capture();
     capture_scope->mark_begin();
 
-    std::vector<uint8_t> data{};
+    std::vector<float> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    auto bytes_data = vox::to_bytes(data);
     std::vector<std::unique_ptr<vox::Command>> commands;
-    commands.emplace_back(buffer->copy_from(data.data()));
+    commands.emplace_back(buffer->copy_from(bytes_data.data()));
     commands.emplace_back(kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}));
     stream->dispatch(std::move(commands));
     stream->synchronize();

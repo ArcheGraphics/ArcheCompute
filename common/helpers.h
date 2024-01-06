@@ -169,9 +169,12 @@ uint32_t to_u32(T value) {
 }
 
 template<typename T>
-inline std::vector<uint8_t> to_bytes(const T &value) {
-    return std::vector<uint8_t>{reinterpret_cast<const uint8_t *>(&value),
-                                reinterpret_cast<const uint8_t *>(&value) + sizeof(T)};
+inline std::vector<std::byte> to_bytes(const T &value) {
+    return std::vector<std::byte>{reinterpret_cast<const std::byte *>(&value),
+                                  reinterpret_cast<const std::byte *>(&value) + sizeof(T)};
 }
 
+[[nodiscard]] inline auto align(size_t s, size_t a) noexcept {
+    return (s + (a - 1)) & ~(a - 1);
+}
 }// namespace vox

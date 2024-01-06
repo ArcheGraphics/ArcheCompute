@@ -7,6 +7,7 @@
 #include "metal_kernel.h"
 #include "metal_buffer.h"
 #include "metal_command_encoder.h"
+#include "common/helpers.h"
 #include <string>
 
 namespace vox {
@@ -35,10 +36,6 @@ std::unique_ptr<ShaderDispatchCommand> MetalKernel::launch_thread_groups(
     std::array<uint32_t, 3> threads_per_thread_group,
     std::vector<Argument> &&args) {
     return std::make_unique<ShaderDispatchCommand>(shared_from_this(), thread_groups_per_grid, threads_per_thread_group, std::move(args));
-}
-
-[[nodiscard]] inline auto align(size_t s, size_t a) noexcept {
-    return (s + (a - 1)) & ~(a - 1);
 }
 
 void MetalKernel::launch(MetalCommandEncoder &encoder, const ShaderDispatchCommand *command) const noexcept {
