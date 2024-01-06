@@ -10,13 +10,21 @@
 #include <Metal/Metal.hpp>
 
 namespace vox {
+class MetalCommandEncoder;
 class MetalKernel : public Kernel {
 public:
     MetalKernel(MTL::Device *device, const std::string &code, const std::string &entry);
 
-    [[nodiscard]] inline const NS::SharedPtr<MTL::ComputePipelineState>& pso() const {
+    std::unique_ptr<ShaderDispatchCommand> launch_thread_groups(
+        std::array<uint32_t, 3> thread_groups_per_grid,
+        std::array<uint32_t, 3> threads_per_thread_group,
+        std::vector<Argument> &&args) override;
+
+    [[nodiscard]] inline const NS::SharedPtr<MTL::ComputePipelineState> &pso() const {
         return _pso;
     }
+
+    void launch(MetalCommandEncoder &encoder, const ShaderDispatchCommand *command) const noexcept;
 
 private:
     NS::SharedPtr<MTL::ComputePipelineState> _pso;

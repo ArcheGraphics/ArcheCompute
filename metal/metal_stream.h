@@ -25,13 +25,8 @@ public:
     void synchronize() override;
 
     [[nodiscard]] MetalStageBufferPool *upload_pool() noexcept;
-    [[nodiscard]] MetalStageBufferPool *download_pool() noexcept;
 
-    void dispatch_thread_groups(
-        std::shared_ptr<Kernel> kernel,
-        std::array<uint32_t, 3> thread_groups_per_grid,
-        std::array<uint32_t, 3> threads_per_thread_group,
-        const std::vector<Argument> &args) override;
+    [[nodiscard]] MetalStageBufferPool *download_pool() noexcept;
 
     void dispatch(std::vector<std::unique_ptr<Command>> commands) override;
 

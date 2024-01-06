@@ -7,16 +7,19 @@
 #pragma once
 
 #include <memory>
-#include <utility>
+#include <vector>
 #include "map_macro.h"
+#include "argument.h"
 
 namespace vox {
 class Buffer;
+class Kernel;
 
-#define COMPUTE_RUNTIME_COMMANDS    \
-    BufferUploadCommand,            \
-        BufferDownloadCommand,      \
-        BufferCopyCommand,          \
+#define COMPUTE_RUNTIME_COMMANDS \
+    BufferUploadCommand,         \
+        BufferDownloadCommand,   \
+        BufferCopyCommand,       \
+        ShaderDispatchCommand,   \
         CustomCommand
 
 #define MAKE_COMMAND_FWD_DECL(CMD) class CMD;
@@ -97,6 +100,30 @@ public:
     [[nodiscard]] auto src_offset() const noexcept { return _src_offset; }
     [[nodiscard]] auto dst_offset() const noexcept { return _dst_offset; }
     [[nodiscard]] auto size() const noexcept { return _size; }
+    void accept(CommandVisitor &visitor) const noexcept override { visitor.visit(this); }
+};
+
+class ShaderDispatchCommand final : public Command {
+private:
+    std::shared_ptr<const Kernel> _handle;
+    std::vector<Argument> _argument_buffer;
+    std::array<uint32_t, 3> _thread_groups_per_grid;
+    std::array<uint32_t, 3> _threads_per_thread_group;
+
+public:
+    ShaderDispatchCommand(std::shared_ptr<const Kernel> shader_handle,
+                          std::array<uint32_t, 3> thread_groups_per_grid,
+                          std::array<uint32_t, 3> threads_per_thread_group,
+                          std::vector<Argument> &&argument_buffer) noexcept
+        : _handle{std::move(shader_handle)},
+          _argument_buffer{std::move(argument_buffer)},
+          _thread_groups_per_grid{thread_groups_per_grid},
+          _threads_per_thread_group{threads_per_thread_group} {}
+
+    [[nodiscard]] auto handle() const noexcept { return _handle; }
+    [[nodiscard]] const std::vector<Argument> &argument_buffer() const noexcept { return _argument_buffer; }
+    [[nodiscard]] auto thread_groups_per_grid() const noexcept { return _thread_groups_per_grid; }
+    [[nodiscard]] auto threads_per_thread_group() const noexcept { return _threads_per_thread_group; }
     void accept(CommandVisitor &visitor) const noexcept override { visitor.visit(this); }
 };
 

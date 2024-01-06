@@ -15,12 +15,6 @@ class Stream {
 public:
     virtual ~Stream() = default;
 
-    virtual void dispatch_thread_groups(
-        std::shared_ptr<Kernel> kernel,
-        std::array<uint32_t, 3> thread_groups_per_grid,
-        std::array<uint32_t, 3> threads_per_thread_group,
-        const std::vector<Argument> &args) = 0;
-
     virtual void synchronize() = 0;
 
     virtual void dispatch(std::vector<std::unique_ptr<Command>> commands) = 0;

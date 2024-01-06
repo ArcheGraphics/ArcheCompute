@@ -18,8 +18,13 @@ public:
     void visit(const BufferDownloadCommand *) noexcept override;
     void visit(const BufferUploadCommand *) noexcept override;
     void visit(const CustomCommand *) noexcept override;
+    void visit(const ShaderDispatchCommand *) noexcept override;
     void add_callback(MetalCallbackContext *cb) noexcept;
     void submit() noexcept;
+
+    [[nodiscard]] inline MTL::CommandBuffer *command_buffer() noexcept {
+        return _command_buffer;
+    }
 
     template<typename F>
     void with_upload_buffer(size_t size, F &&f) noexcept {

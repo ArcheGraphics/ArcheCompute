@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include "rhi/command.h"
 #include "metal/metal_device.h"
+#include "metal/metal_buffer.h"
 #include "metal/metal_stream.h"
 #include "metal/extension/metal_debug_capture_ext.h"
 
@@ -37,12 +38,14 @@ TEST(Metal, Base) {
 
     capture_scope->start_debug_capture();
     capture_scope->mark_begin();
+
     std::vector<uint8_t> data{};
     std::vector<std::unique_ptr<vox::Command>> commands;
     commands.emplace_back(buffer->copy_from(data.data()));
+    commands.emplace_back(kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}));
     stream->dispatch(std::move(commands));
-    stream->dispatch_thread_groups(kernel, {1, 1, 1}, {1, 1, 1}, {buffer});
     stream->synchronize();
+
     capture_scope->mark_end();
     capture_scope->stop_debug_capture();
 }

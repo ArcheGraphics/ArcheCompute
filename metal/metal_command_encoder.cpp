@@ -7,6 +7,7 @@
 #include "metal_command_encoder.h"
 #include "metal_stream.h"
 #include "metal_buffer.h"
+#include "metal_kernel.h"
 
 namespace vox {
 MetalCommandEncoder::MetalCommandEncoder(MetalStream *stream) noexcept
@@ -75,7 +76,13 @@ void MetalCommandEncoder::visit(const BufferUploadCommand *command) noexcept {
     });
 }
 
-void MetalCommandEncoder::visit(const CustomCommand *) noexcept {
+void MetalCommandEncoder::visit(const ShaderDispatchCommand *command) noexcept {
+    _prepare_command_buffer();
+    auto kernel = std::static_pointer_cast<const MetalKernel>(command->handle());
+    kernel->launch(*this, command);
+}
+
+void MetalCommandEncoder::visit(const CustomCommand *command) noexcept {
     _prepare_command_buffer();
 }
 
