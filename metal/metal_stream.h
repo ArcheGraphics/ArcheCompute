@@ -7,7 +7,7 @@
 #pragma once
 
 #include "rhi/stream.h"
-#include "metal_stage_buffer_pool.h"
+#include "metal_callback_context.h"
 #include <Metal/Metal.hpp>
 #include <queue>
 
@@ -24,10 +24,6 @@ public:
 
     void synchronize() override;
 
-    [[nodiscard]] MetalStageBufferPool *upload_pool() noexcept;
-
-    [[nodiscard]] MetalStageBufferPool *download_pool() noexcept;
-
     void dispatch(const std::vector<std::shared_ptr<Command>> &commands) override;
 
     inline MTL::CommandQueue *queue() {
@@ -38,12 +34,7 @@ public:
 
 private:
     MTL::CommandQueue *_queue{nullptr};
-    spin_mutex _upload_pool_creation_mutex;
-    spin_mutex _download_pool_creation_mutex;
     spin_mutex _callback_mutex;
-    spin_mutex _dispatch_mutex;
-    std::unique_ptr<MetalStageBufferPool> _upload_pool;
-    std::unique_ptr<MetalStageBufferPool> _download_pool;
     std::queue<CallbackContainer> _callback_lists;
 };
 }// namespace vox

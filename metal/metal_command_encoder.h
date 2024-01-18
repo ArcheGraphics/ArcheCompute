@@ -26,22 +26,6 @@ public:
         return _command_buffer;
     }
 
-    template<typename F>
-    void with_upload_buffer(size_t size, F &&f) noexcept {
-        _prepare_command_buffer();
-        auto upload_buffer = _stream->upload_pool()->allocate(size);
-        f(upload_buffer);
-        add_callback(upload_buffer);
-    }
-
-    template<typename F>
-    void with_download_buffer(size_t size, F &&f) noexcept {
-        _prepare_command_buffer();
-        auto download_buffer = _stream->download_pool()->allocate(size);
-        f(download_buffer);
-        add_callback(download_buffer);
-    }
-
 private:
     MetalStream *_stream;
     MTL::CommandBuffer *_command_buffer{nullptr};

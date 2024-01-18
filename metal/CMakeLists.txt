@@ -20,8 +20,6 @@ set(COMMON_FILES
         metal_kernel.cpp
         metal_command_encoder.h
         metal_command_encoder.cpp
-        metal_stage_buffer_pool.h
-        metal_stage_buffer_pool.cpp
         metal_callback_context.h
         metal_callback_context.cpp
 )

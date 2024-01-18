@@ -20,28 +20,6 @@ MetalStream::~MetalStream() {
     _queue->release();
 }
 
-MetalStageBufferPool *MetalStream::upload_pool() noexcept {
-    {
-        std::scoped_lock lock{_upload_pool_creation_mutex};
-        if (_upload_pool == nullptr) {
-            _upload_pool = std::make_unique<MetalStageBufferPool>(
-                _queue->device(), 64000000, true);
-        }
-    }
-    return _upload_pool.get();
-}
-
-MetalStageBufferPool *MetalStream::download_pool() noexcept {
-    {
-        std::scoped_lock lock{_download_pool_creation_mutex};
-        if (_download_pool == nullptr) {
-            _download_pool = std::make_unique<MetalStageBufferPool>(
-                _queue->device(), 32000000, false);
-        }
-    }
-    return _download_pool.get();
-}
-
 void MetalStream::synchronize() {
     auto command_buffer = _queue->commandBufferWithUnretainedReferences();
     command_buffer->commit();

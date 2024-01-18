@@ -40,40 +40,23 @@ void MetalCommandEncoder::visit(const BufferCopyCommand *command) noexcept {
 }
 
 void MetalCommandEncoder::visit(const BufferDownloadCommand *command) noexcept {
-    _prepare_command_buffer();
     auto buffer = std::static_pointer_cast<const MetalBuffer>(command->handle());
     auto offset = command->offset();
     auto size = command->size();
     auto data = command->data();
-    with_download_buffer(size, [&](MetalStageBufferPool::Allocation *download_buffer) noexcept {
-        auto encoder = _command_buffer->blitCommandEncoder();
-        encoder->copyFromBuffer(buffer->handle(), offset,
-                                download_buffer->buffer(),
-                                download_buffer->offset(), size);
-        encoder->endEncoding();
-        // copy from download buffer to user buffer
-        add_callback(FunctionCallbackContext::create([download_buffer, data, size] {
-            std::memcpy(data, download_buffer->data(), size);
-        }));
-    });
+
+    // copy from download buffer to user buffer
+    add_callback(FunctionCallbackContext::create([buffer, offset, size, data] {
+        std::memcpy(data, buffer->handle()->contents(), size);
+    }));
 }
 
 void MetalCommandEncoder::visit(const BufferUploadCommand *command) noexcept {
-    _prepare_command_buffer();
     auto buffer = std::static_pointer_cast<const MetalBuffer>(command->handle());
     auto offset = command->offset();
     auto size = command->size();
     auto data = command->data();
-    with_upload_buffer(size, [&](MetalStageBufferPool::Allocation *upload_buffer) noexcept {
-        auto p = static_cast<std::byte *>(upload_buffer->buffer()->contents()) +
-                 upload_buffer->offset();
-        std::memcpy(p, data, size);
-        auto encoder = _command_buffer->blitCommandEncoder();
-        encoder->copyFromBuffer(upload_buffer->buffer(),
-                                upload_buffer->offset(),
-                                buffer->handle(), offset, size);
-        encoder->endEncoding();
-    });
+    std::memcpy(buffer->handle()->contents(), data, size);
 }
 
 void MetalCommandEncoder::visit(const ShaderDispatchCommand *command) noexcept {
