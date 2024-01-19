@@ -5,9 +5,10 @@ cmake_minimum_required(VERSION 3.15...3.27)
 # Scikit-build-core sets these values for you, or you can just hard-code the
 # name and version.
 project(
-  ${SKBUILD_PROJECT_NAME}
-  VERSION ${SKBUILD_PROJECT_VERSION}
-  LANGUAGES CXX)
+        ${SKBUILD_PROJECT_NAME}
+        VERSION ${SKBUILD_PROJECT_VERSION}
+        LANGUAGES CXX
+)
 
 # Find the module development requirements (requires FindPython from 3.17 or
 # scikit-build-core's built-in backport)
@@ -18,11 +19,7 @@ find_package(pybind11 CONFIG REQUIRED)
 # this)
 python_add_library(_core MODULE device.cpp WITH_SOABI)
 target_link_libraries(_core PRIVATE pybind11::headers common rhi)
-if (APPLE)
-    target_link_libraries(_core PRIVATE metal)
-else ()
-    target_link_libraries(_core PRIVATE cuda)
-endif ()
+target_link_libraries(_core PRIVATE metal)
 
 target_include_directories(_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../)
 

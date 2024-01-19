@@ -8,15 +8,11 @@
 #include <pybind11/stl.h>
 #include "common/logging.h"
 
-#ifdef __APPLE__
 #include "metal/metal_device.h"
 #include "metal/metal_stream.h"
 #include "metal/metal_buffer.h"
 #include "metal/metal_kernel.h"
 #include "metal/extension/metal_debug_capture_ext.h"
-#else
-#include "cuda/cuda_device.h"
-#endif
 
 namespace py = pybind11;
 
@@ -29,11 +25,7 @@ std::unique_ptr<vox::Device> create_device(DeviceType type) {
     switch (type) {
         case DeviceType::CPU: return nullptr;
         case DeviceType::GPU: {
-#ifdef __APPLE__
             return std::make_unique<vox::MetalDevice>();
-#else
-            return std::make_unique<vox::CUDADevice>();
-#endif
         }
     }
 }

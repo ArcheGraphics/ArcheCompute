@@ -23,9 +23,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         ../)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-if (APPLE)
-    target_link_libraries(${PROJECT_NAME} PRIVATE metal metal-cpp)
-else ()
-    enable_language(CUDA)
-    target_link_libraries(${PROJECT_NAME} PRIVATE cuda)
-endif ()
+target_link_libraries(${PROJECT_NAME} PRIVATE metal metal-cpp)
