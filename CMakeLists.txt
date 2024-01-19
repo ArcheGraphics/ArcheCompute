@@ -34,26 +34,16 @@ include(check_atomic)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-find_package(CUDAToolkit)
 
 add_subdirectory(common)
 add_subdirectory(rhi)
-if (APPLE)
-    # Add third party libraries
-    add_subdirectory(third_party)
-    add_subdirectory(metal)
-    add_compile_definitions()
-endif ()
 
-if (CUDAToolkit_FOUND)
-    enable_language(CUDA)
-    include_directories(${CUDA_INCLUDE_DIRS})
-    add_subdirectory(cuda)
-endif ()
+# Add third party libraries
+add_subdirectory(third_party)
+add_subdirectory(metal)
+add_compile_definitions()
 
 add_subdirectory(python)
 add_subdirectory(cpptests)
 
-if (APPLE)
-    add_subdirectory(apps)
-endif ()
+add_subdirectory(apps)
