@@ -16,6 +16,7 @@ set(COMMON_FILES
         kernel.h
         argument.h
         command.h
+        counter.h
 )
 
 set(EXTENSION_FILES
@@ -26,6 +27,8 @@ set(EXTENSION_FILES
 set(PROJECT_FILES
         ${COMMON_FILES}
         ${EXTENSION_FILES}
+        counter.cpp
+        kernel.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES})

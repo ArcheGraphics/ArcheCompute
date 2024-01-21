@@ -14,12 +14,14 @@
 namespace vox {
 class Buffer;
 class Kernel;
+class Counter;
 
 #define COMPUTE_RUNTIME_COMMANDS \
     BufferUploadCommand,         \
         BufferDownloadCommand,   \
         BufferCopyCommand,       \
         ShaderDispatchCommand,   \
+        CounterSampleCommand,    \
         CustomCommand
 
 #define MAKE_COMMAND_FWD_DECL(CMD) class CMD;
@@ -124,6 +126,21 @@ public:
     [[nodiscard]] const std::vector<Argument> &argument_buffer() const noexcept { return _argument_buffer; }
     [[nodiscard]] auto thread_groups_per_grid() const noexcept { return _thread_groups_per_grid; }
     [[nodiscard]] auto threads_per_thread_group() const noexcept { return _threads_per_thread_group; }
+    void accept(CommandVisitor &visitor) const noexcept override { visitor.visit(this); }
+};
+
+class CounterSampleCommand : public Command {
+private:
+    std::shared_ptr<const Counter> _handle;
+    std::uintptr_t _index;
+
+public:
+    explicit CounterSampleCommand(std::shared_ptr<const Counter> handle,
+                                  std::uintptr_t index) noexcept
+        : _handle(std::move(handle)), _index{index} {}
+    [[nodiscard]] auto handle() const noexcept { return _handle; }
+    [[nodiscard]] auto index() const noexcept { return _index; }
+
     void accept(CommandVisitor &visitor) const noexcept override { visitor.visit(this); }
 };
 

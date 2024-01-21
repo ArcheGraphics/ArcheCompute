@@ -31,9 +31,12 @@ list(APPEND CMAKE_MODULE_PATH
 
 include(global_options)
 include(check_atomic)
+include(build_metallib)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+
+set(MLX_METAL_PATH ${CMAKE_CURRENT_BINARY_DIR}/kernels/)
 
 add_subdirectory(common)
 add_subdirectory(rhi)
@@ -41,9 +44,10 @@ add_subdirectory(rhi)
 # Add third party libraries
 add_subdirectory(third_party)
 add_subdirectory(metal)
-add_compile_definitions()
 
 add_subdirectory(python)
 add_subdirectory(cpptests)
+
+add_subdirectory(benchmark)
 
 add_subdirectory(apps)

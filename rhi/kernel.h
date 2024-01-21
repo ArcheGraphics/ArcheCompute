@@ -15,9 +15,9 @@ public:
     Kernel() = default;
     virtual ~Kernel() = default;
 
-    virtual std::shared_ptr<ShaderDispatchCommand> launch_thread_groups(
+    std::shared_ptr<ShaderDispatchCommand> launch_thread_groups(
         std::array<uint32_t, 3> thread_groups_per_grid,
         std::array<uint32_t, 3> threads_per_thread_group,
-        const std::vector<Argument> &args) = 0;
+        const std::vector<Argument> &args);
 };
 }// namespace vox

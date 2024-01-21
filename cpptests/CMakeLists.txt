@@ -10,6 +10,7 @@ project(cpp-tests LANGUAGES C CXX)
 set(SRC
         main.cpp
         test_metal.cpp
+        test_metallib.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC})

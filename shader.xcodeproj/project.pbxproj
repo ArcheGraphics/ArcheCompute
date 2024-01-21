@@ -8,11 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		045ED7C22B5A1974006DA197 /* shader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 045ED7C12B5A1974006DA197 /* shader.metal */; };
+		045ED7D22B5BF560006DA197 /* mad_throughput.metal in Sources */ = {isa = PBXBuildFile; fileRef = 045ED7D12B5BF560006DA197 /* mad_throughput.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		045ED7BE2B5A1974006DA197 /* shader.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = shader.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
 		045ED7C12B5A1974006DA197 /* shader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = shader.metal; sourceTree = "<group>"; };
+		045ED7C82B5A1FEB006DA197 /* array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = array.h; sourceTree = "<group>"; };
+		045ED7C92B5A7F1D006DA197 /* vec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vec.h; sourceTree = "<group>"; };
+		045ED7CA2B5AA386006DA197 /* mat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mat.h; sourceTree = "<group>"; };
+		045ED7CB2B5AA60C006DA197 /* quat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = quat.h; sourceTree = "<group>"; };
+		045ED7CC2B5AA752006DA197 /* spatial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = spatial.h; sourceTree = "<group>"; };
+		045ED7CD2B5AA899006DA197 /* rand.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = rand.h; sourceTree = "<group>"; };
+		045ED7CE2B5AA9FB006DA197 /* noise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = noise.h; sourceTree = "<group>"; };
+		045ED7CF2B5AAD96006DA197 /* hash_grid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hash_grid.h; sourceTree = "<group>"; };
+		045ED7D12B5BF560006DA197 /* mad_throughput.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = mad_throughput.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -35,9 +45,26 @@
 		045ED7C02B5A1974006DA197 /* shader */ = {
 			isa = PBXGroup;
 			children = (
+				045ED7D02B5BF54F006DA197 /* builtin */,
 				045ED7C12B5A1974006DA197 /* shader.metal */,
+				045ED7C82B5A1FEB006DA197 /* array.h */,
+				045ED7C92B5A7F1D006DA197 /* vec.h */,
+				045ED7CA2B5AA386006DA197 /* mat.h */,
+				045ED7CB2B5AA60C006DA197 /* quat.h */,
+				045ED7CC2B5AA752006DA197 /* spatial.h */,
+				045ED7CD2B5AA899006DA197 /* rand.h */,
+				045ED7CE2B5AA9FB006DA197 /* noise.h */,
+				045ED7CF2B5AAD96006DA197 /* hash_grid.h */,
 			);
 			path = shader;
+			sourceTree = "<group>";
+		};
+		045ED7D02B5BF54F006DA197 /* builtin */ = {
+			isa = PBXGroup;
+			children = (
+				045ED7D12B5BF560006DA197 /* mad_throughput.metal */,
+			);
+			path = builtin;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -95,6 +122,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				045ED7D22B5BF560006DA197 /* mad_throughput.metal in Sources */,
 				045ED7C22B5A1974006DA197 /* shader.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

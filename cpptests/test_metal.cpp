@@ -21,7 +21,7 @@ TEST(Metal, Base) {
         #include <metal_stdlib>
         using namespace metal;
 
-        struct alignas(16) Arguments {
+        struct alignas(8) Arguments {
             device float* buffer;
         };
 
@@ -36,7 +36,7 @@ TEST(Metal, Base) {
     std::vector<float> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     auto bytes_data = vox::to_bytes(data);
     auto buffer = device->create_buffer(sizeof(float), 10);
-    auto kernel = device->create_kernel(kernelSrc, "kernel_main");
+    auto kernel = device->create_kernel_with_source(kernelSrc, "kernel_main");
 
     capture_scope->start_debug_capture();
     capture_scope->mark_begin();

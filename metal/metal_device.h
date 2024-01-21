@@ -18,7 +18,9 @@ public:
 
     ~MetalDevice() override;
 
-    std::string_view name() override;
+    std::string name() override;
+
+    std::string builtin_lib_name() override;
 
     std::unique_ptr<MetalDebugCaptureExt> debug_capture();
 
@@ -26,9 +28,16 @@ public:
 
     std::shared_ptr<Stream> create_stream() override;
 
-    std::shared_ptr<Kernel> create_kernel(const std::string &code, const std::string &entry) override;
+    std::shared_ptr<Kernel> create_kernel_with_source(const std::string &code, const std::string &entry) override;
+
+    std::shared_ptr<Kernel> create_kernel_from_library(const std::string &lib_name, const std::string &entry) override;
+
+    void register_library(const std::string &lib_name) override;
+
+    std::shared_ptr<Counter> create_counter(uint32_t count) override;
 
 private:
     MTL::Device *_device{nullptr};
+    std::unordered_map<std::string, MTL::Library *> library_map_;
 };
 }// namespace vox

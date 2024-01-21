@@ -22,6 +22,8 @@ set(COMMON_FILES
         metal_command_encoder.cpp
         metal_callback_context.h
         metal_callback_context.cpp
+        metal_counter.h
+        metal_counter.cpp
 )
 
 set(EXTENSION_FILES
@@ -45,3 +47,24 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         rhi
         metal-cpp
 )
+
+set(KERNEL_FIELS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shader/builtin/mad_throughput.metal
+)
+
+build_metallib(
+        TARGET metal_kernel_metallib
+        TITLE metal_kernel
+        SOURCES ${KERNEL_FIELS}
+        INCLUDE_DIRS ${PROJECT_SOURCE_DIR} ${MLX_INCLUDE_DIRS}
+        OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+add_dependencies(
+        ${PROJECT_NAME}
+        metal_kernel_metallib
+)
+
+set(MLX_METAL_PATH ${CMAKE_CURRENT_BINARY_DIR}/)
+target_compile_definitions(
+        ${PROJECT_NAME} PRIVATE METAL_PATH= "${MLX_METAL_PATH}/metal_kernel.metallib")

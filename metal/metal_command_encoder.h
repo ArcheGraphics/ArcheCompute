@@ -19,6 +19,7 @@ public:
     void visit(const BufferUploadCommand *) noexcept override;
     void visit(const CustomCommand *) noexcept override;
     void visit(const ShaderDispatchCommand *) noexcept override;
+    void visit(const vox::CounterSampleCommand *) noexcept override;
     void add_callback(MetalCallbackContext *cb) noexcept;
     void submit() noexcept;
 

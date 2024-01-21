@@ -11,16 +11,10 @@
 #include <string>
 
 namespace vox {
-MetalKernel::MetalKernel(MTL::Device *device, const std::string &code, const std::string &entry) {
+MetalKernel::MetalKernel(MTL::Device *device, MTL::Library *lib, const std::string &entry) {
     NS::Error *pError = nullptr;
 
-    MTL::Library *pComputeLibrary = device->newLibrary(NS::String::string(code.c_str(), NS::UTF8StringEncoding), nullptr, &pError);
-    if (!pComputeLibrary) {
-        __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
-        assert(false);
-    }
-
-    MTL::Function *pMandelbrotFn = pComputeLibrary->newFunction(NS::String::string(entry.c_str(), NS::UTF8StringEncoding));
+    MTL::Function *pMandelbrotFn = lib->newFunction(NS::String::string(entry.c_str(), NS::UTF8StringEncoding));
     _pso = NS::TransferPtr(device->newComputePipelineState(pMandelbrotFn, &pError));
     if (!_pso) {
         __builtin_printf("%s\n", pError->localizedDescription()->utf8String());
@@ -28,19 +22,11 @@ MetalKernel::MetalKernel(MTL::Device *device, const std::string &code, const std
     }
 
     pMandelbrotFn->release();
-    pComputeLibrary->release();
-}
-
-std::shared_ptr<ShaderDispatchCommand> MetalKernel::launch_thread_groups(
-    std::array<uint32_t, 3> thread_groups_per_grid,
-    std::array<uint32_t, 3> threads_per_thread_group,
-    const std::vector<Argument> &args) {
-    return std::make_shared<ShaderDispatchCommand>(shared_from_this(), thread_groups_per_grid, threads_per_thread_group, args);
 }
 
 void MetalKernel::launch(MetalCommandEncoder &encoder, const ShaderDispatchCommand *command) const noexcept {
     static constexpr auto argument_buffer_size = 65536u;
-    static constexpr auto argument_alignment = 16u;
+    static constexpr auto argument_alignment = 8u;
     static thread_local std::array<std::byte, argument_buffer_size> argument_buffer;
 
     // encode arguments
@@ -73,7 +59,7 @@ void MetalKernel::launch(MetalCommandEncoder &encoder, const ShaderDispatchComma
                 return;
             } else if constexpr (std::is_same_v<T, BufferArgument>) {
                 auto metal_buffer = std::static_pointer_cast<MetalBuffer>(arg);
-                compute_encoder->useResource(metal_buffer->handle(), MTL::ResourceUsageWrite);
+                compute_encoder->useResource(metal_buffer->handle(), MTL::ResourceUsageWrite | MTL::ResourceUsageRead);
             }
         },
                    arg);
