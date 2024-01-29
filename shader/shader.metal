@@ -18,9 +18,13 @@ using namespace metal;
 
 #include "hash_grid.h"
 
+#include "device/group_scan.h"
+
 void test(device array_t<atomic_int>& arr) {
     atomic_add(arr, 1, 1);
     atomic_sub(arr, 1, 1);
     atomic_min(arr, 1, 1);
     atomic_max(arr, 1, 1);
+    
+    vox::CTAReduce<2> a;
 }

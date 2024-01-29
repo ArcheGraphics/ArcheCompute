@@ -67,4 +67,4 @@ add_dependencies(
 
 set(MLX_METAL_PATH ${CMAKE_CURRENT_BINARY_DIR}/)
 target_compile_definitions(
-        ${PROJECT_NAME} PRIVATE METAL_PATH= "${MLX_METAL_PATH}/metal_kernel.metallib")
+        ${PROJECT_NAME} PRIVATE METAL_PATH="${MLX_METAL_PATH}/metal_kernel.metallib")

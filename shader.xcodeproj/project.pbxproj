@@ -23,6 +23,8 @@
 		045ED7CE2B5AA9FB006DA197 /* noise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = noise.h; sourceTree = "<group>"; };
 		045ED7CF2B5AAD96006DA197 /* hash_grid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hash_grid.h; sourceTree = "<group>"; };
 		045ED7D12B5BF560006DA197 /* mad_throughput.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = mad_throughput.metal; sourceTree = "<group>"; };
+		0462C2722B67324600B5A104 /* device_types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = device_types.h; sourceTree = "<group>"; };
+		0462C2732B6735C100B5A104 /* group_scan.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = group_scan.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -45,6 +47,7 @@
 		045ED7C02B5A1974006DA197 /* shader */ = {
 			isa = PBXGroup;
 			children = (
+				0462C2712B67322D00B5A104 /* device */,
 				045ED7D02B5BF54F006DA197 /* builtin */,
 				045ED7C12B5A1974006DA197 /* shader.metal */,
 				045ED7C82B5A1FEB006DA197 /* array.h */,
@@ -65,6 +68,15 @@
 				045ED7D12B5BF560006DA197 /* mad_throughput.metal */,
 			);
 			path = builtin;
+			sourceTree = "<group>";
+		};
+		0462C2712B67322D00B5A104 /* device */ = {
+			isa = PBXGroup;
+			children = (
+				0462C2722B67324600B5A104 /* device_types.h */,
+				0462C2732B6735C100B5A104 /* group_scan.h */,
+			);
+			path = device;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
