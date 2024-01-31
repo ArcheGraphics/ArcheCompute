@@ -50,6 +50,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 set(KERNEL_FIELS
         ${CMAKE_CURRENT_SOURCE_DIR}/../shader/builtin/mad_throughput.metal
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shader/builtin/reduce.metal
 )
 
 build_metallib(
