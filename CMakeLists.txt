@@ -23,7 +23,7 @@ cmake_minimum_required(VERSION 3.16)
 # globally add VKB_DEBUG for the debug build
 add_compile_definitions($<$<CONFIG:DEBUG>:METAL_DEBUG>)
 
-project(arche-compute)
+project(ArcheCompute)
 
 # Add path for local cmake scripts
 list(APPEND CMAKE_MODULE_PATH
