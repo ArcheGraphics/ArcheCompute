@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <simd/simd.h>
+#include "types/spatial.h"
 #include "types/half_types.h"
 
 namespace vox {
@@ -23,6 +23,18 @@ struct Dtype {
         int64,
         float16,
         float32,
+
+        quat,
+        float2,
+        float3,
+        float4,
+        float2x2,
+        float3x3,
+        float4x4,
+
+        transform,
+        spatial_vector,
+        spatial_matrix
     };
 
     Val val;
@@ -48,11 +60,23 @@ static constexpr Dtype int64{Dtype::Val::int64, sizeof(int64_t)};
 static constexpr Dtype float16{Dtype::Val::float16, sizeof(uint16_t)};
 static constexpr Dtype float32{Dtype::Val::float32, sizeof(float)};
 
-inline uint8_t size_of(const Dtype& t) {
+static constexpr Dtype quat{Dtype::Val::quat, sizeof(simd::quatf)};
+static constexpr Dtype float2{Dtype::Val::float2, sizeof(simd::float2)};
+static constexpr Dtype float3{Dtype::Val::float3, sizeof(simd::float3)};
+static constexpr Dtype float4{Dtype::Val::float4, sizeof(simd::float4)};
+static constexpr Dtype float2x2{Dtype::Val::float2x2, sizeof(simd::float2x2)};
+static constexpr Dtype float3x3{Dtype::Val::float3x3, sizeof(simd::float3x3)};
+static constexpr Dtype float4x4{Dtype::Val::float4x4, sizeof(simd::float4x4)};
+
+static constexpr Dtype transform{Dtype::Val::transform, sizeof(Transform)};
+static constexpr Dtype spatial_vector{Dtype::Val::spatial_vector, sizeof(SpatialVector)};
+static constexpr Dtype spatial_matrix{Dtype::Val::spatial_matrix, sizeof(SpatialMatrix)};
+
+inline uint8_t size_of(const Dtype &t) {
     return t.size;
 }
 
-template <typename T>
+template<typename T>
 struct TypeToDtype {
     operator Dtype();
 };

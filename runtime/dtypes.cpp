@@ -63,8 +63,53 @@ TypeToDtype<float>::operator Dtype() {
 }
 
 template<>
-TypeToDtype<double>::operator Dtype() {
-    return float32;
+TypeToDtype<simd::quatf>::operator Dtype() {
+    return quat;
+}
+
+template<>
+TypeToDtype<simd::float2>::operator Dtype() {
+    return float2;
+}
+
+template<>
+TypeToDtype<simd::float3>::operator Dtype() {
+    return float3;
+}
+
+template<>
+TypeToDtype<simd::float4>::operator Dtype() {
+    return float4;
+}
+
+template<>
+TypeToDtype<simd::float2x2>::operator Dtype() {
+    return float2x2;
+}
+
+template<>
+TypeToDtype<simd::float3x3>::operator Dtype() {
+    return float3x3;
+}
+
+template<>
+TypeToDtype<simd::float4x4>::operator Dtype() {
+    return float4x4;
+}
+
+template<>
+TypeToDtype<Transform>::operator Dtype() {
+    return transform;
+}
+
+template<>
+TypeToDtype<SpatialVector>::operator Dtype() {
+    return spatial_vector;
+}
+
+template<>
+TypeToDtype<SpatialMatrix>::operator Dtype() {
+    return spatial_matrix;
 }
 
 }// namespace vox

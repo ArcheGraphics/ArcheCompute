@@ -10,6 +10,7 @@ project(runtime LANGUAGES C CXX)
 
 set(COMMON_FILES
         types/half_types.h
+        types/spatial.h
         dtypes.h
         dtypes.cpp
 )
