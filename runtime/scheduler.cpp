@@ -4,13 +4,13 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#pragma once
+#include "scheduler.h"
 
-#ifdef __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
+namespace vox {
+/** A singleton scheduler to manage devices, streams, and task execution. */
+Scheduler &scheduler() {
+    static Scheduler scheduler;
+    return scheduler;
+}
 
-#include <arm_fp16.h>
-namespace mlx::core {
-typedef __fp16 float16_t;
-}// namespace mlx::core
-
-#endif// __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
+}// namespace vox

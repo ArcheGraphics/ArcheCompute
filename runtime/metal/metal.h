@@ -6,11 +6,15 @@
 
 #pragma once
 
-#ifdef __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
+#include <future>
+#include <memory>
+#include <vector>
 
-#include <arm_fp16.h>
-namespace mlx::core {
-typedef __fp16 float16_t;
-}// namespace mlx::core
+#include "../stream.h"
 
-#endif// __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
+namespace vox::metal {
+
+void new_stream(Stream stream);
+std::shared_ptr<void> new_scoped_memory_pool();
+
+}// namespace vox::metal

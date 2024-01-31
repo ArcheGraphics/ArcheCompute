@@ -13,6 +13,16 @@ set(COMMON_FILES
         types/spatial.h
         dtypes.h
         dtypes.cpp
+        device.h
+        device.cpp
+        stream.h
+        stream.cpp
+        scheduler.h
+        scheduler.cpp
+        metal/metal.h
+        metal/metal.cpp
+        metal/device.h
+        metal/device.cpp
 )
 
 set(PROJECT_FILES
@@ -25,4 +35,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} .
 target_link_libraries(${PROJECT_NAME} PUBLIC
         fmt::fmt
         spdlog::spdlog
+        metal-cpp
 )
