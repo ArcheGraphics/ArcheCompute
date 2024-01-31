@@ -19,10 +19,14 @@ set(COMMON_FILES
         stream.cpp
         scheduler.h
         scheduler.cpp
+        allocator.h
+        allocator.cpp
         metal/metal.h
         metal/metal.cpp
         metal/device.h
         metal/device.cpp
+        metal/allocator.h
+        metal/allocator.cpp
 )
 
 set(PROJECT_FILES
