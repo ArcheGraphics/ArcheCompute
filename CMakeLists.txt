@@ -1,4 +1,4 @@
-#  Copyright (c) 2023 Feng Yang
+#  Copyright (c) 2024 Feng Yang
 #
 #  I am making my contributions/submissions to this project solely in my
 #  personal capacity and am not conveying any rights to any intellectual
@@ -40,6 +40,7 @@ set(MLX_METAL_PATH ${CMAKE_CURRENT_BINARY_DIR}/kernels/)
 
 add_subdirectory(common)
 add_subdirectory(rhi)
+add_subdirectory(runtime)
 
 # Add third party libraries
 add_subdirectory(third_party)

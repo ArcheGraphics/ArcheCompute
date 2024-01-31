@@ -4,9 +4,13 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include <gtest/gtest.h>
+#pragma once
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+#ifdef __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
+
+#include <arm_fp16.h>
+namespace mlx::core {
+typedef __fp16 float16_t;
+} // namespace mlx::core
+
+#endif // __ARM_FEATURE_FP16_SCALAR_ARITHMETIC

@@ -1,4 +1,4 @@
-#  Copyright (c) 2023 Feng Yang
+#  Copyright (c) 2024 Feng Yang
 #
 #  I am making my contributions/submissions to this project solely in my
 #  personal capacity and am not conveying any rights to any intellectual
@@ -34,6 +34,8 @@ set(EXTENSION_FILES
 set(PROJECT_FILES
         ${COMMON_FILES}
         ${EXTENSION_FILES}
+        ../runtime/dtypes.cpp
+        ../runtime/dtypes.h
 )
 
 add_library(${PROJECT_NAME} OBJECT ${PROJECT_FILES})

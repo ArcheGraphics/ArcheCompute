@@ -6,29 +6,16 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-project(rhi LANGUAGES C CXX)
+project(runtime LANGUAGES C CXX)
 
 set(COMMON_FILES
-        device.h
-        stream.h
-        buffer.h
-        buffer.cpp
-        kernel.h
-        argument.h
-        command.h
-        counter.h
-)
-
-set(EXTENSION_FILES
-        extension/device_extension.h
-        extension/debug_capture_ext.h
+        types/half_types.h
+        dtypes.h
+        dtypes.cpp
 )
 
 set(PROJECT_FILES
         ${COMMON_FILES}
-        ${EXTENSION_FILES}
-        counter.cpp
-        kernel.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES})
