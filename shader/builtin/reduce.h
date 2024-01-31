@@ -24,6 +24,7 @@ struct None {
     }
 };
 
+//MARK: - And
 struct And {
     bool simd_reduce(bool val) {
         return simd_all(val);
@@ -61,6 +62,7 @@ struct And {
     }
 };
 
+// MARK: - Or
 struct Or {
     bool simd_reduce(bool val) {
         return simd_any(val);
@@ -98,6 +100,7 @@ struct Or {
     }
 };
 
+//MARK: - Sum
 template<typename U>
 struct Sum {
     template<typename T>
@@ -118,6 +121,47 @@ struct Sum {
     }
 };
 
+template<>
+struct Sum<float2> {
+    float2 simd_reduce(float2 val) {
+        return simd_sum(val);
+    };
+
+    static constexpr constant float2 init = float2(0);
+
+    void atomic_update(device mlx_atomic<float> *out, float2 val) {
+        mlx_atomic_fetch_add_explicit(out, val[0], 0);
+        mlx_atomic_fetch_add_explicit(out, val[1], 1);
+    }
+
+    // Operator
+    float2 operator()(float2 a, float2 b) {
+        return a + b;
+    }
+};
+
+template<>
+struct Sum<float4> {
+    float4 simd_reduce(float4 val) {
+        return simd_sum(val);
+    };
+
+    static constexpr constant float4 init = float4(0);
+
+    void atomic_update(device mlx_atomic<float> *out, float4 val) {
+        mlx_atomic_fetch_add_explicit(out, val[0], 0);
+        mlx_atomic_fetch_add_explicit(out, val[1], 1);
+        mlx_atomic_fetch_add_explicit(out, val[2], 2);
+        mlx_atomic_fetch_add_explicit(out, val[3], 3);
+    }
+
+    // Operator
+    float4 operator()(float4 a, float4 b) {
+        return a + b;
+    }
+};
+
+//MARK: - Prod
 template<typename U>
 struct Prod {
     template<typename T>
@@ -138,6 +182,47 @@ struct Prod {
     }
 };
 
+template<>
+struct Prod<float2> {
+    float2 simd_reduce(float2 val) {
+        return simd_product(val);
+    };
+
+    static constexpr constant float2 init = float2(1);
+
+    void atomic_update(device mlx_atomic<float> *out, float2 val, uint offset = 0) {
+        mlx_atomic_fetch_mul_explicit(out, val[0], 0);
+        mlx_atomic_fetch_mul_explicit(out, val[1], 1);
+    }
+
+    // Operator
+    float2 operator()(float2 a, float2 b) {
+        return a * b;
+    }
+};
+
+template<>
+struct Prod<float4> {
+    float4 simd_reduce(float4 val) {
+        return simd_product(val);
+    };
+
+    static constexpr constant float4 init = float4(1);
+
+    void atomic_update(device mlx_atomic<float> *out, float4 val, uint offset = 0) {
+        mlx_atomic_fetch_mul_explicit(out, val[0], 0);
+        mlx_atomic_fetch_mul_explicit(out, val[1], 1);
+        mlx_atomic_fetch_mul_explicit(out, val[2], 2);
+        mlx_atomic_fetch_mul_explicit(out, val[3], 3);
+    }
+
+    // Operator
+    float4 operator()(float4 a, float4 b) {
+        return a * b;
+    }
+};
+
+//MARK: - Min
 template<typename U>
 struct Min {
     template<typename T>
@@ -158,6 +243,7 @@ struct Min {
     }
 };
 
+// MARK: - Max
 template<typename U>
 struct Max {
     template<typename T>

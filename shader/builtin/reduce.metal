@@ -48,18 +48,18 @@ template <typename T, typename U, typename Op, int N_READS=REDUCE_N_READS>
     // complete the reduction in two steps of simd-level reductions.
     
     Op op;
-    threadgroup U local_vals[simd_size];
+    threadgroup T local_vals[simd_size];
     
-    U total_val = Op::init;
+    T total_val = Op::init;
     
     in += gid * N_READS;
     
     int r = 0;
     for(; r < (int)ceildiv(in_size, grid_size * N_READS) - 1; r++) {
-        U vals[N_READS] = {op.init};
+        T vals[N_READS] = {op.init};
         
         for(int i = 0; i < N_READS; i++) {
-            vals[i] = static_cast<U>(in[i * in_stride]);
+            vals[i] = in[i * in_stride];
         }
         for(int i = 0; i < N_READS; i++) {
             total_val = op(vals[i], total_val);
@@ -79,8 +79,8 @@ template <typename T, typename U, typename Op, int N_READS=REDUCE_N_READS>
             vals[i] = in[idx * in_stride];
         }
         for(int i = 0; i < N_READS; i++) {
-            U val = i < max_reads ? vals[i] : Op::init;
-            total_val = op(static_cast<U>(val), total_val);
+            T val = i < max_reads ? vals[i] : Op::init;
+            total_val = op(val, total_val);
         }
     }
     
@@ -97,15 +97,7 @@ template <typename T, typename U, typename Op, int N_READS=REDUCE_N_READS>
     
     // Reduction across threadgroups
     if (lid == 0) {
-        size_t offsets = sizeof(T) / sizeof(U);
-        if (offsets > 1) {
-            #pragma clang loop unroll(full)
-            for(size_t offset = 0; offset < offsets; offset++) {
-                op.atomic_update(out, total_val, offset);
-            }
-        } else {
-            op.atomic_update(out, total_val);
-        }
+        op.atomic_update(out, total_val);
     }
 }
 
@@ -115,7 +107,7 @@ template <typename T, typename U, typename Op, int N_READS=REDUCE_N_READS>
       const device itype *in [[buffer(0)]], \
       device mlx_atomic<otype> *out [[buffer(1)]], \
       const device size_t& in_size [[buffer(2)]], \
-      const device size_t& in_stride [[buffer(3)]], \
+      const device size_t& byte_stride [[buffer(3)]], \
       uint gid [[thread_position_in_grid]], \
       uint lid [[thread_position_in_threadgroup]], \
       uint grid_size [[threads_per_grid]], \
@@ -123,11 +115,14 @@ template <typename T, typename U, typename Op, int N_READS=REDUCE_N_READS>
       uint simd_lane_id [[thread_index_in_simdgroup]], \
       uint simd_group_id [[simdgroup_index_in_threadgroup]]);
 
+instantiate_all_reduce(sum_float4, float4, float, Sum<float4>)
+instantiate_all_reduce(sum_float2, float2, float, Sum<float2>)
+instantiate_all_reduce(prod_float4, float4, float, Prod<float4>)
+instantiate_all_reduce(prod_float2, float2, float, Prod<float2>)
+
 #define instantiate_same_reduce(name, tname, type, op) \
   instantiate_init_reduce(name ##tname, type, op<type>) \
   instantiate_all_reduce(name ##tname, type, type, op<type>)
-
-//instantiate_all_reduce(sum, float4, float4x4, Sum<float4>)
 
 instantiate_same_reduce(sum, uint8, uint8_t, Sum)
 instantiate_same_reduce(sum, uint16, uint16_t, Sum)
