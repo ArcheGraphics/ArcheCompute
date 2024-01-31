@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		045ED7C22B5A1974006DA197 /* shader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 045ED7C12B5A1974006DA197 /* shader.metal */; };
 		045ED7D22B5BF560006DA197 /* mad_throughput.metal in Sources */ = {isa = PBXBuildFile; fileRef = 045ED7D12B5BF560006DA197 /* mad_throughput.metal */; };
+		0462C2792B69F69400B5A104 /* reduce.metal in Sources */ = {isa = PBXBuildFile; fileRef = 0462C2782B69F69400B5A104 /* reduce.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		0462C2752B69EBBA00B5A104 /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
 		0462C2762B69EBD800B5A104 /* complex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = complex.h; sourceTree = "<group>"; };
 		0462C2772B69EBEF00B5A104 /* atomic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atomic.h; sourceTree = "<group>"; };
+		0462C2782B69F69400B5A104 /* reduce.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = reduce.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -71,6 +73,7 @@
 				0462C2762B69EBD800B5A104 /* complex.h */,
 				0462C2752B69EBBA00B5A104 /* utils.h */,
 				0462C2742B69EB7B00B5A104 /* reduce.h */,
+				0462C2782B69F69400B5A104 /* reduce.metal */,
 			);
 			path = builtin;
 			sourceTree = "<group>";
@@ -132,6 +135,7 @@
 			files = (
 				045ED7D22B5BF560006DA197 /* mad_throughput.metal in Sources */,
 				045ED7C22B5A1974006DA197 /* shader.metal in Sources */,
+				0462C2792B69F69400B5A104 /* reduce.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
