@@ -19,6 +19,6 @@ set(SRC
 
 add_executable(${PROJECT_NAME} ${SRC})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE common metal metal-cpp benchmark::benchmark benchmark::benchmark_main GTest::gtest)
+target_link_libraries(${PROJECT_NAME} PRIVATE common runtime metal-cpp benchmark::benchmark benchmark::benchmark_main GTest::gtest)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../)

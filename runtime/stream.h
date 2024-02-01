@@ -6,31 +6,33 @@
 
 #pragma once
 
-#include "device.h"
+#include <Metal/Metal.hpp>
+#include <mutex>
 
 namespace vox {
+extern "C" void compute_metal_stream_print_function_logs(MTL::LogContainer *logs);
 
-struct Stream {
-    int index;
-    Device device;
-    explicit Stream(int index, Device device) : index(index), device(device) {}
+class Stream {
+public:
+    explicit Stream(uint32_t index);
+
+    inline MTL::CommandQueue *queue() {
+        return _queue;
+    }
+
+    MTL::CommandBuffer *get_command_buffer();
+
+    MTL::ComputeCommandEncoder *get_command_encoder();
+
+    void synchronize(bool wait = false);
+
+    ~Stream();
+
+private:
+    uint32_t _index{};
+    MTL::CommandQueue *_queue;
+    MTL::CommandBuffer *_command_buffer{};
+    MTL::ComputeCommandEncoder *_encoder{};
+    std::mutex mtx_;
 };
-
-inline bool operator==(const Stream &lhs, const Stream &rhs) {
-    return lhs.index == rhs.index;
-}
-
-inline bool operator!=(const Stream &lhs, const Stream &rhs) {
-    return !(lhs == rhs);
-}
-
-/** Get the default stream for the given device. */
-Stream default_stream();
-
-/** Make the stream the default for its device. */
-void set_default_stream(Stream s);
-
-/** Make a new stream on the given device. */
-Stream new_stream(Device d);
-
 }// namespace vox

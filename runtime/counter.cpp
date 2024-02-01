@@ -4,28 +4,29 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "metal_counter.h"
-
+#include "counter.h"
+#include "device.h"
+#include "stream.h"
 #include "common/logging.h"
 
 namespace vox {
-MetalCounter::MetalCounter(MTL::Device *device, uint32_t sampleCount,
-                           MTL::CommonCounterSet counterSetName)
-    : device{device} {
+Counter::Counter(uint32_t sampleCount,
+                 MTL::CommonCounterSet counterSetName) {
     auto sampleBufferDesc = MTL::CounterSampleBufferDescriptor::alloc()->init();
     sampleBufferDesc->setStorageMode(MTL::StorageModeShared);
     sampleBufferDesc->setSampleCount(sampleCount);
     sampleBufferDesc->setCounterSet(get_counter_set(counterSetName));
 
     NS::Error *error{nullptr};
-    buffer = device->newCounterSampleBuffer(sampleBufferDesc, &error);
+    buffer = device().handle()->newCounterSampleBuffer(sampleBufferDesc, &error);
     if (error != nullptr) {
         ERROR("Error: could not create sample buffer: {}",
               error->description()->cString(NS::StringEncoding::UTF8StringEncoding));
     }
 }
 
-MTL::CounterSet *MetalCounter::get_counter_set(MTL::CommonCounterSet counterSetName) {
+MTL::CounterSet *Counter::get_counter_set(MTL::CommonCounterSet counterSetName) {
+    auto device = vox::device().handle();
     auto count = device->counterSets()->count();
     for (int i = 0; i < count; ++i) {
         auto counterSet = static_cast<MTL::CounterSet *>(device->counterSets()->object(i));
@@ -40,7 +41,7 @@ MTL::CounterSet *MetalCounter::get_counter_set(MTL::CommonCounterSet counterSetN
           device->name()->utf8String(), counterSetName->utf8String());
 }
 
-bool MetalCounter::is_counter_support(MTL::CounterSet *counterSet, MTL::CommonCounter counterName) {
+bool Counter::is_counter_support(MTL::CounterSet *counterSet, MTL::CommonCounter counterName) {
     auto count = counterSet->counters()->count();
     for (int i = 0; i < count; ++i) {
         auto counter = static_cast<MTL::Counter *>(counterSet->counters()->object(i));
@@ -56,7 +57,7 @@ bool MetalCounter::is_counter_support(MTL::CounterSet *counterSet, MTL::CommonCo
     return false;
 }
 
-std::vector<MTL::CounterSamplingPoint> MetalCounter::sampling_boundaries() {
+std::vector<MTL::CounterSamplingPoint> Counter::sampling_boundaries() {
     std::array allBoundaries = {
         MTL::CounterSamplingPointAtStageBoundary,
         MTL::CounterSamplingPointAtDrawBoundary,
@@ -66,7 +67,7 @@ std::vector<MTL::CounterSamplingPoint> MetalCounter::sampling_boundaries() {
 
     std::vector<MTL::CounterSamplingPoint> boundaries;
     for (auto boundary : allBoundaries) {
-        if (device->supportsCounterSampling(boundary)) {
+        if (device().handle()->supportsCounterSampling(boundary)) {
             // Add the boundary to the return-value array.
             boundaries.push_back(boundary);
         }
@@ -75,32 +76,32 @@ std::vector<MTL::CounterSamplingPoint> MetalCounter::sampling_boundaries() {
     return boundaries;
 }
 
-MTL::CounterSampleBuffer *MetalCounter::get_handle() const {
+MTL::CounterSampleBuffer *Counter::get_handle() const {
     return buffer;
 }
 
-void MetalCounter::update_start_times() {
+void Counter::update_start_times() {
     // Save the current CPU and GPU times as a baseline.
     MTL::Timestamp cpuStartTimestamp = 0;
     MTL::Timestamp gpuStartTimestamp = 0;
 
-    device->sampleTimestamps(&cpuStartTimestamp, &gpuStartTimestamp);
+    device().handle()->sampleTimestamps(&cpuStartTimestamp, &gpuStartTimestamp);
     cpuStart = (double)cpuStartTimestamp;
     gpuStart = (double)gpuStartTimestamp;
 }
 
-void MetalCounter::update_final_times() {
+void Counter::update_final_times() {
     // Update the final times with the current CPU and GPU times.
     MTL::Timestamp cpuFinalTimestamp = 0;
     MTL::Timestamp gpuFinalTimestamp = 0;
 
-    device->sampleTimestamps(&cpuFinalTimestamp, &gpuFinalTimestamp);
+    device().handle()->sampleTimestamps(&cpuFinalTimestamp, &gpuFinalTimestamp);
 
     cpuTimeSpan = (double)cpuFinalTimestamp - cpuStart;
     gpuTimeSpan = (double)gpuFinalTimestamp - gpuStart;
 }
 
-double MetalCounter::calculate_elapsed_seconds_between(uint32_t begin, uint32_t end) {
+double Counter::calculate_elapsed_seconds_between(uint32_t begin, uint32_t end) {
     /// Represents the size of the counter sample buffer.
     NS::Range range = NS::Range::Make(begin, end + 1);
     // Convert the contents of the counter sample buffer into the standard data format.
@@ -118,7 +119,7 @@ double MetalCounter::calculate_elapsed_seconds_between(uint32_t begin, uint32_t 
     return micro_seconds_between(timestamps[begin].timestamp, timestamps[end].timestamp) / 1000.0;
 }
 
-double MetalCounter::absolute_time_in_microseconds(MTL::Timestamp timestamp) const {
+double Counter::absolute_time_in_microseconds(MTL::Timestamp timestamp) const {
     // Convert the GPU time to a value within the range [0.0, 1.0].
     double normalizedGpuTime = ((double)timestamp - gpuStart);
     normalizedGpuTime /= gpuTimeSpan;
@@ -131,7 +132,7 @@ double MetalCounter::absolute_time_in_microseconds(MTL::Timestamp timestamp) con
     return microseconds;
 }
 
-double MetalCounter::micro_seconds_between(MTL::Timestamp begin, MTL::Timestamp end) const {
+double Counter::micro_seconds_between(MTL::Timestamp begin, MTL::Timestamp end) const {
     double timeSpan = (double)end - (double)begin;
 
     // Convert GPU time to CPU time.
@@ -139,6 +140,11 @@ double MetalCounter::micro_seconds_between(MTL::Timestamp begin, MTL::Timestamp 
 
     double microseconds = nanoseconds / 1000.0;
     return microseconds;
+}
+
+void Counter::sample_counters_in_buffer(std::uintptr_t index, uint32_t stream) const {
+    auto encoder = vox::stream(stream).get_command_encoder();
+    encoder->sampleCountersInBuffer(get_handle(), index, false);
 }
 
 }// namespace vox

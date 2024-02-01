@@ -13,31 +13,62 @@ set(COMMON_FILES
         types/spatial.h
         dtypes.h
         dtypes.cpp
+        metal.h
+        metal.cpp
         device.h
         device.cpp
         stream.h
         stream.cpp
-        scheduler.h
-        scheduler.cpp
+        stream_objc.mm
         allocator.h
         allocator.cpp
-        metal/metal.h
-        metal/metal.cpp
-        metal/device.h
-        metal/device.cpp
-        metal/allocator.h
-        metal/allocator.cpp
+        array.h
+        array.cpp
+        kernel.h
+        kernel.cpp
+        counter.h
+        counter.cpp
+)
+
+set(EXTENSION_FILES
+        extension/debug_capture_ext.h
+        extension/debug_capture_ext.cpp
 )
 
 set(PROJECT_FILES
         ${COMMON_FILES}
+        ${EXTENSION_FILES}
 )
 
-add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ../)
+add_library(${PROJECT_NAME} OBJECT ${PROJECT_FILES})
+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../)
+
+# Link third party libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-        fmt::fmt
-        spdlog::spdlog
+        common
         metal-cpp
 )
+
+set(KERNEL_FIELS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shader/builtin/mad_throughput.metal
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shader/builtin/reduce.metal
+)
+
+build_metallib(
+        TARGET metal_kernel_metallib
+        TITLE metal_kernel
+        SOURCES ${KERNEL_FIELS}
+        INCLUDE_DIRS ${PROJECT_SOURCE_DIR} ${MLX_INCLUDE_DIRS}
+        OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+add_dependencies(
+        ${PROJECT_NAME}
+        metal_kernel_metallib
+)
+
+set(MLX_METAL_PATH ${CMAKE_CURRENT_BINARY_DIR}/)
+target_compile_definitions(
+        ${PROJECT_NAME} PRIVATE METAL_PATH="${MLX_METAL_PATH}/metal_kernel.metallib")

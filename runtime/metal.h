@@ -10,11 +10,6 @@
 #include <memory>
 #include <vector>
 
-#include "../stream.h"
-
-namespace vox::metal {
-
-void new_stream(Stream stream);
+namespace vox {
 std::shared_ptr<void> new_scoped_memory_pool();
-
-}// namespace vox::metal
+}// namespace vox

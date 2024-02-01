@@ -6,54 +6,57 @@
 
 #pragma once
 
+#include <map>
 #include <cstdlib>
+#include "device.h"
 
 namespace vox {
 
 // Simple wrapper around buffer pointers
 // WARNING: Only Buffer objects constructed from and those that wrap
 //          raw pointers from mlx::allocator are supported.
-class Buffer {
+class Buffer final {
 private:
-    void *ptr_;
+    MTL::Buffer *ptr_;
 
 public:
-    Buffer(void *ptr) : ptr_(ptr){};
+    explicit Buffer(MTL::Buffer *ptr) : ptr_(ptr){};
 
     // Get the raw data pointer from the buffer
     void *raw_ptr();
 
+    [[nodiscard]] uint64_t address() const;
+
     // Get the buffer pointer from the buffer
-    const void *ptr() const {
+    [[nodiscard]] const MTL::Buffer *ptr() const {
         return ptr_;
     };
-    void *ptr() {
+    MTL::Buffer *ptr() {
         return ptr_;
     };
 };
 
-Buffer malloc(size_t size);
-
-void free(Buffer buffer);
-
-// Wait for running tasks to finish and free up memory
-// if allocation fails
-Buffer malloc_or_wait(size_t size);
-
-class Allocator {
-    /** Abstract base class for a memory allocator. */
+class Allocator final {
 public:
-    virtual Buffer malloc(size_t size, bool allow_swap = false) = 0;
-    virtual void free(Buffer buffer) = 0;
+    Buffer malloc(size_t size, bool allow_swap = false);
+    void free(Buffer buffer);
 
-    Allocator() = default;
-    Allocator(const Allocator &other) = delete;
-    Allocator(Allocator &&other) = delete;
-    Allocator &operator=(const Allocator &other) = delete;
-    Allocator &operator=(Allocator &&other) = delete;
-    virtual ~Allocator() = default;
+private:
+    MTL::Device *device_;
+    Allocator();
+    friend Allocator &allocator();
+
+    // Allocation stats
+    size_t peak_allocated_size_;
+    size_t block_limit_;
+    size_t gc_limit_;
 };
 
 Allocator &allocator();
+
+//----------------------------------------------------------------------------------------------------------------------
+Buffer malloc(size_t size);
+
+void free(Buffer buffer);
 
 }// namespace vox

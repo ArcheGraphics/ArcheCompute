@@ -24,4 +24,4 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         ../)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE common GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-target_link_libraries(${PROJECT_NAME} PRIVATE metal metal-cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE runtime metal-cpp)

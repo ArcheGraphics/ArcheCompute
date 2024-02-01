@@ -11,7 +11,7 @@
 namespace vox::benchmark {
 class MADThroughPut : public BenchmarkAPI {
 public:
-    void register_benchmarks(Device *device, std::shared_ptr<Stream> &stream, LatencyMeasureMode mode) override;
+    void register_benchmarks(LatencyMeasureMode mode) override;
 };
 
 }// namespace vox::benchmark

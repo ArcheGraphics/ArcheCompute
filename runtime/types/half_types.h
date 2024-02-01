@@ -9,8 +9,8 @@
 #ifdef __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
 
 #include <arm_fp16.h>
-namespace mlx::core {
+namespace vox {
 typedef __fp16 float16_t;
-}// namespace mlx::core
+}// namespace vox
 
 #endif// __ARM_FEATURE_FP16_SCALAR_ARITHMETIC

@@ -5,22 +5,21 @@
 //  property of any third parties.
 
 #include <gtest/gtest.h>
-#include "metal/metal_device.h"
-#include "metal/metal_buffer.h"
-#include "metal/metal_stream.h"
-#include "metal/extension/metal_debug_capture_ext.h"
+#include "runtime/device.h"
+#include "runtime/array.h"
+#include "runtime/extension/debug_capture_ext.h"
+#include "runtime/kernel.h"
 #include <fmt/format.h>
 
+using namespace vox;
+
 TEST(Metal, Metallib) {
-    auto device = std::make_unique<vox::MetalDevice>();
-    auto stream = device->create_stream();
-    auto capture = device->debug_capture();
-    auto capture_scope = capture->create_scope("arche-capture");
+    auto capture_scope = DebugCaptureExt::create_scope("arche-capture");
 
     const size_t num_element = 1024;
-    auto src0_buffer = device->create_buffer(sizeof(float), num_element);
-    auto src1_buffer = device->create_buffer(sizeof(float), num_element);
-    auto dst_buffer = device->create_buffer(sizeof(float), num_element);
+    Array src0_array(float32, {num_element});
+    Array src1_array(float32, {num_element});
+    Array dst_array(float32, {num_element});
     auto getSrc0 = [](size_t i) {
         float v = float((i % 9) + 1) * 0.1f;
         return v;
@@ -39,29 +38,26 @@ TEST(Metal, Metallib) {
         for (size_t i = 0; i < num_element; i++) {
             src_float_buffer1[i] = getSrc1(i);
         }
-        stream->dispatch({src0_buffer->copy_from(src_float_buffer0.data()),
-                          src1_buffer->copy_from(src_float_buffer1.data())});
-        stream->synchronize();
+        src0_array.copy_from(src_float_buffer0.data());
+        src1_array.copy_from(src_float_buffer1.data());
     }
 
-    auto kernel = device->create_kernel_from_library("metal_kernel",
-                                                     fmt::format("mad_throughput_{}", 100000));
+    auto kernel = Kernel::builder()
+                      .entry(fmt::format("mad_throughput_{}", 100000))
+                      .build();
 
-    capture_scope->start_debug_capture();
-    capture_scope->mark_begin();
+    capture_scope.start_debug_capture();
+    capture_scope.mark_begin();
     {
-        stream->dispatch({kernel->launch_thread_groups(
-            {(uint32_t)num_element / 4 / 32, 1, 1},
-            {32, 1, 1},
-            {src0_buffer, src1_buffer, dst_buffer})});
-        stream->synchronize();
+        kernel({(uint32_t)num_element / 4 / 32, 1, 1},
+               {32, 1, 1},
+               {src0_array, src1_array, dst_array});
     }
-    capture_scope->mark_end();
-    capture_scope->stop_debug_capture();
-
     std::vector<float> dst_float_buffer(num_element);
-    stream->dispatch({dst_buffer->copy_to(dst_float_buffer.data())});
-    stream->synchronize();
+    dst_array.copy_to(dst_float_buffer.data());
+
+    capture_scope.mark_end();
+    capture_scope.stop_debug_capture();
 
     for (size_t i = 0; i < num_element; i++) {
         float limit = getSrc1(i) * (1.f / (1.f - getSrc0(i)));

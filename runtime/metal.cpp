@@ -4,17 +4,15 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#pragma once
-
-#include <variant>
-#include <memory>
+#include "metal.h"
+#include "device.h"
 
 namespace vox {
-class Buffer;
+std::shared_ptr<void> new_scoped_memory_pool() {
+    auto dtor = [](void *ptr) {
+        static_cast<NS::AutoreleasePool *>(ptr)->release();
+    };
+    return {NS::AutoreleasePool::alloc()->init(), dtor};
+}
 
-using BufferArgument = std::shared_ptr<Buffer>;
-
-using UniformArgument = std::vector<uint8_t>;
-
-using Argument = std::variant<BufferArgument, UniformArgument>;
 }// namespace vox

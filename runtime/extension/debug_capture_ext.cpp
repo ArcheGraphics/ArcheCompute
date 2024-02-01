@@ -4,8 +4,9 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "metal_debug_capture_ext.h"
-#include "metal_stream.h"
+#include "debug_capture_ext.h"
+#include "stream.h"
+#include "device.h"
 #include <fmt/format.h>
 
 namespace vox {
@@ -47,46 +48,38 @@ template<typename Object>
         mtl_label->release();
     }
     desc->setCaptureObject(scope);
-    return std::make_unique<MetalDebugCaptureScope>(desc, scope);
+    return DebugCaptureScope(desc, scope);
 }
 }// namespace detail
 
-MetalDebugCaptureExt::MetalDebugCaptureExt(MTL::Device *device) noexcept
-    : _device{device} {}
-
-MetalDebugCaptureExt::~MetalDebugCaptureExt() noexcept = default;
-
-std::unique_ptr<DebugCaptureScope> MetalDebugCaptureExt::create_scope(
-    std::string_view label, const DebugCaptureOption &option) const noexcept {
-    return detail::create_capture_scope(label, option, _device);
+DebugCaptureScope DebugCaptureExt::create_scope(
+    std::string_view label, const DebugCaptureOption &option) {
+    return detail::create_capture_scope(label, option, device().handle());
 }
 
-std::unique_ptr<DebugCaptureScope> MetalDebugCaptureExt::create_scope(
-    const std::shared_ptr<Stream> &stream_handle,
-    std::string_view label, const DebugCaptureOption &option) const noexcept {
-    auto metal_stream = std::static_pointer_cast<MetalStream>(stream_handle);
-    return detail::create_capture_scope(label, option, metal_stream->queue());
+DebugCaptureScope DebugCaptureExt::create_scope(uint32_t stream, std::string_view label, const DebugCaptureOption &option) {
+    return detail::create_capture_scope(label, option, vox::stream(stream).queue());
 }
 
-MetalDebugCaptureScope::MetalDebugCaptureScope(MTL::CaptureDescriptor *descriptor,
-                                               MTL::CaptureScope *scope) noexcept
+DebugCaptureScope::DebugCaptureScope(MTL::CaptureDescriptor *descriptor,
+                                     MTL::CaptureScope *scope) noexcept
     : _scope{scope}, _descriptor{descriptor} {}
 
-MetalDebugCaptureScope::~MetalDebugCaptureScope() {
+DebugCaptureScope::~DebugCaptureScope() {
     if (_scope) { _scope->endScope(); }
     _scope->release();
     _descriptor->release();
 }
 
-void MetalDebugCaptureScope::mark_begin() const noexcept {
+void DebugCaptureScope::mark_begin() const noexcept {
     _scope->beginScope();
 }
 
-void MetalDebugCaptureScope::mark_end() const noexcept {
+void DebugCaptureScope::mark_end() const noexcept {
     _scope->endScope();
 }
 
-void MetalDebugCaptureScope::start_debug_capture() const noexcept {
+void DebugCaptureScope::start_debug_capture() const noexcept {
     auto manager = MTL::CaptureManager::sharedCaptureManager();
     NS::Error *error = nullptr;
     manager->startCapture(_descriptor, &error);
@@ -95,7 +88,7 @@ void MetalDebugCaptureScope::start_debug_capture() const noexcept {
     }
 }
 
-void MetalDebugCaptureScope::stop_debug_capture() const noexcept {
+void DebugCaptureScope::stop_debug_capture() const noexcept {
     auto manager = MTL::CaptureManager::sharedCaptureManager();
     manager->stopCapture();
 }

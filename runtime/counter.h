@@ -6,29 +6,30 @@
 
 #pragma once
 
-#include "metal_device.h"
-#include "rhi/counter.h"
+#include "device.h"
 
 namespace vox {
-class MetalCounter : public Counter {
+class Counter {
 public:
-    MetalCounter(MTL::Device *device, uint32_t sampleCount,
-                 MTL::CommonCounterSet counterSetName = MTL::CommonCounterSetTimestamp);
+    explicit Counter(uint32_t sampleCount,
+                     MTL::CommonCounterSet counterSetName = MTL::CommonCounterSetTimestamp);
 
     static bool is_counter_support(MTL::CounterSet *counterSet, MTL::CommonCounter counterName);
 
-    MTL::CounterSet *get_counter_set(MTL::CommonCounterSet counterSetName);
+    static MTL::CounterSet *get_counter_set(MTL::CommonCounterSet counterSetName);
 
-    std::vector<MTL::CounterSamplingPoint> sampling_boundaries();
+    static std::vector<MTL::CounterSamplingPoint> sampling_boundaries();
 
 public:
-    MTL::CounterSampleBuffer *get_handle() const;
+    [[nodiscard]] MTL::CounterSampleBuffer *get_handle() const;
 
-    void update_start_times() override;
+    void update_start_times();
 
-    void update_final_times() override;
+    void update_final_times();
 
-    double calculate_elapsed_seconds_between(uint32_t begin, uint32_t end) override;
+    double calculate_elapsed_seconds_between(uint32_t begin, uint32_t end);
+
+    void sample_counters_in_buffer(std::uintptr_t index, uint32_t stream = 0) const;
 
 private:
     [[nodiscard]] double absolute_time_in_microseconds(MTL::Timestamp timestamp) const;
@@ -36,7 +37,6 @@ private:
     [[nodiscard]] double micro_seconds_between(MTL::Timestamp begin, MTL::Timestamp end) const;
 
 private:
-    MTL::Device *device;
     MTL::CounterSampleBuffer *buffer;
 
     double cpuStart{};

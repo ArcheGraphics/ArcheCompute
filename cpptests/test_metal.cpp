@@ -5,17 +5,16 @@
 //  property of any third parties.
 
 #include <gtest/gtest.h>
-#include "metal/metal_device.h"
-#include "metal/metal_buffer.h"
-#include "metal/metal_stream.h"
-#include "metal/extension/metal_debug_capture_ext.h"
+#include "runtime/device.h"
+#include "runtime/array.h"
+#include "runtime/extension/debug_capture_ext.h"
 #include "common/helpers.h"
+#include "runtime/kernel.h"
+
+using namespace vox;
 
 TEST(Metal, Base) {
-    auto device = std::make_unique<vox::MetalDevice>();
-    auto stream = device->create_stream();
-    auto capture = device->debug_capture();
-    auto capture_scope = capture->create_scope("arche-capture");
+    auto capture_scope = DebugCaptureExt::create_scope("arche-capture");
 
     const char *kernelSrc = R"(
         #include <metal_stdlib>
@@ -35,19 +34,22 @@ TEST(Metal, Base) {
 
     std::vector<float> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     auto bytes_data = vox::to_bytes(data);
-    auto buffer = device->create_buffer(sizeof(float), 10);
-    auto kernel = device->create_kernel_with_source(kernelSrc, "kernel_main");
+    auto array = Array({10}, float32);
+    auto kernel = Kernel::builder()
+                      .entry("kernel_main")
+                      .lib_name("custom_lib")
+                      .source(kernelSrc)
+                      .build();
 
-    capture_scope->start_debug_capture();
-    capture_scope->mark_begin();
+    capture_scope.start_debug_capture();
+    capture_scope.mark_begin();
     {
-        stream->dispatch({buffer->copy_from(bytes_data.data()),
-                          kernel->launch_thread_groups({1, 1, 1}, {1, 1, 1}, {buffer}),
-                          buffer->copy_to(bytes_data.data())});
-        stream->synchronize();
+        array.copy_from(bytes_data.data());
+        kernel({1, 1, 1}, {1, 1, 1}, {array});
+        array.copy_to(bytes_data.data());
     }
-    capture_scope->mark_end();
-    capture_scope->stop_debug_capture();
+    capture_scope.mark_end();
+    capture_scope.stop_debug_capture();
 
     vox::from_bytes(bytes_data, data);
     for (int i = 0; i < 10; ++i) {

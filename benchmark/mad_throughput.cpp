@@ -5,28 +5,28 @@
 //  property of any third parties.
 
 #include "mad_throughput.h"
+#include "runtime/device.h"
+#include "runtime/array.h"
+#include "runtime/kernel.h"
+#include "runtime/extension/debug_capture_ext.h"
 #include "data_type_util.h"
-#include "rhi/stream.h"
-#include "rhi/buffer.h"
-#include "rhi/counter.h"
-#include "metal_device.h"
-#include "metal/extension/metal_debug_capture_ext.h"
+#include "counter.h"
 #include <spdlog/fmt/fmt.h>
 #include <gtest/gtest.h>
 
 namespace vox::benchmark {
 static void throughput(::benchmark::State &state,
                        LatencyMeasureMode mode,
-                       Device *device,
-                       const std::shared_ptr<Stream> &stream,
-                       const std::shared_ptr<Kernel> &kernel,
-                       size_t num_element, int loop_count, DataType data_type) {
+                       const std::string &kernel_name,
+                       int num_element, int loop_count, Dtype data_type) {
+    auto kernel = Kernel::builder().entry(kernel_name).build();
+
     //===-------------------------------------------------------------------===/
     // Create buffers
     //===-------------------------------------------------------------------===/
-    auto src0_buffer = device->create_buffer(get_size(data_type), num_element);
-    auto src1_buffer = device->create_buffer(get_size(data_type), num_element);
-    auto dst_buffer = device->create_buffer(get_size(data_type), num_element);
+    Array src0_buffer(data_type, {num_element});
+    Array src1_buffer(data_type, {num_element});
+    Array dst_buffer(data_type, {num_element});
 
     //===-------------------------------------------------------------------===/
     // Set source buffer data
@@ -40,7 +40,7 @@ static void throughput(::benchmark::State &state,
         return v;
     };
 
-    if (data_type == DataType::fp16) {
+    if (data_type == float16) {
         std::vector<uint16_t> src_float_buffer0(num_element);
         for (size_t i = 0; i < num_element; i++) {
             src_float_buffer0[i] = fp16(getSrc0(i)).get_value();
@@ -51,10 +51,9 @@ static void throughput(::benchmark::State &state,
             src_float_buffer1[i] = fp16(getSrc1(i)).get_value();
         }
 
-        stream->dispatch({src0_buffer->copy_from(src_float_buffer0.data()),
-                          src1_buffer->copy_from(src_float_buffer1.data())});
-        stream->synchronize();
-    } else if (data_type == DataType::fp32) {
+        src0_buffer.copy_from(src_float_buffer0.data());
+        src1_buffer.copy_from(src_float_buffer1.data());
+    } else if (data_type == float32) {
         std::vector<float> src_float_buffer0(num_element);
         for (size_t i = 0; i < num_element; i++) {
             src_float_buffer0[i] = getSrc0(i);
@@ -65,28 +64,25 @@ static void throughput(::benchmark::State &state,
             src_float_buffer1[i] = getSrc1(i);
         }
 
-        stream->dispatch({src0_buffer->copy_from(src_float_buffer0.data()),
-                          src1_buffer->copy_from(src_float_buffer1.data())});
-        stream->synchronize();
+        src0_buffer.copy_from(src_float_buffer0.data());
+        src1_buffer.copy_from(src_float_buffer1.data());
     }
 
     //===-------------------------------------------------------------------===/
     // Dispatch
     //===-------------------------------------------------------------------===/
-    stream->dispatch({kernel->launch_thread_groups(
+    kernel(
         {(uint32_t)num_element / 4 / 32, 1, 1},
         {32, 1, 1},
-        {src0_buffer, src1_buffer, dst_buffer})});
-    stream->synchronize();
+        {src0_buffer, src1_buffer, dst_buffer});
 
     //===-------------------------------------------------------------------===/
     // Verify destination buffer data
     //===-------------------------------------------------------------------===/
 
-    if (data_type == DataType::fp16) {
+    if (data_type == float16) {
         std::vector<uint16_t> dst_float_buffer(num_element);
-        stream->dispatch({dst_buffer->copy_to(dst_float_buffer.data())});
-        stream->synchronize();
+        dst_buffer.copy_to(dst_float_buffer.data());
 
         for (size_t i = 0; i < num_element; i++) {
             float limit = getSrc1(i) * (1.f / (1.f - getSrc0(i)));
@@ -95,10 +91,9 @@ static void throughput(::benchmark::State &state,
                 << " has incorrect value: expected to be " << limit
                 << " but found " << fp16(dst_float_buffer[i]).to_float();
         }
-    } else if (data_type == DataType::fp32) {
+    } else if (data_type == float32) {
         std::vector<float> dst_float_buffer(num_element);
-        stream->dispatch({dst_buffer->copy_to(dst_float_buffer.data())});
-        stream->synchronize();
+        dst_buffer.copy_to(dst_float_buffer.data());
 
         for (size_t i = 0; i < num_element; i++) {
             float limit = getSrc1(i) * (1.f / (1.f - getSrc0(i)));
@@ -113,28 +108,45 @@ static void throughput(::benchmark::State &state,
     // Benchmarking
     //===-------------------------------------------------------------------===/
     {
+        std::unique_ptr<Counter> gpu_counter;
+        bool use_timestamp = mode == LatencyMeasureMode::kGpuTimestamp;
+        if (use_timestamp) {
+            gpu_counter = std::make_unique<Counter>(2);
+        }
+
         for ([[maybe_unused]] auto _ : state) {
-            auto capture = static_cast<vox::MetalDevice *>(device)->debug_capture();
-            auto capture_scope = capture->create_scope("arche-capture");
+            auto capture_scope = DebugCaptureExt::create_scope("arche-capture");
 
             auto start_time = std::chrono::high_resolution_clock::now();
 
-            capture_scope->start_debug_capture();
-            capture_scope->mark_begin();
-            stream->dispatch({kernel->launch_thread_groups(
-                {(uint32_t)num_element / 4 / 32, 1, 1},
-                {32, 1, 1},
-                {src0_buffer, src1_buffer, dst_buffer})});
-            capture_scope->mark_end();
-            capture_scope->stop_debug_capture();
+            capture_scope.start_debug_capture();
+            capture_scope.mark_begin();
+            if (use_timestamp) {
+                gpu_counter->sample_counters_in_buffer(0);
+            }
+            kernel({(uint32_t)num_element / 4 / 32, 1, 1},
+                   {32, 1, 1},
+                   {src0_buffer, src1_buffer, dst_buffer});
+            if (use_timestamp) {
+                gpu_counter->sample_counters_in_buffer(1);
+                gpu_counter->update_start_times();
+            }
+            synchronize();
+            capture_scope.mark_end();
+            capture_scope.stop_debug_capture();
 
-            stream->synchronize();
-
+            // prepare convert
+            if (use_timestamp) {
+                gpu_counter->update_final_times();
+            }
             auto end_time = std::chrono::high_resolution_clock::now();
             auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time);
             switch (mode) {
                 case LatencyMeasureMode::kSystemSubmit:
                     state.SetIterationTime(elapsed_seconds.count());
+                    break;
+                case LatencyMeasureMode::kGpuTimestamp:
+                    state.SetIterationTime(gpu_counter->calculate_elapsed_seconds_between(0, 1));
                     break;
             }
         }
@@ -149,20 +161,17 @@ static void throughput(::benchmark::State &state,
     }
 }
 
-void MADThroughPut::register_benchmarks(Device *device, std::shared_ptr<Stream> &stream, LatencyMeasureMode mode) {
+void MADThroughPut::register_benchmarks(LatencyMeasureMode mode) {
     const size_t num_element = 1024 * 1024;
     const int min_loop_count = 100000;
     const int max_loop_count = min_loop_count * 2;
 
     for (int loop_count = min_loop_count; loop_count <= max_loop_count;
          loop_count += min_loop_count) {
-        auto kernel = device->create_kernel_from_library(device->builtin_lib_name(),
-                                                         fmt::format("mad_throughput_{}", loop_count));
+        std::string test_name = fmt::format("{}/{}/{}/{}", device().name(), "mad_throughput", num_element, loop_count);
 
-        std::string test_name = fmt::format("{}/{}/{}/{}", device->name(), "mad_throughput", num_element, loop_count);
-
-        ::benchmark::RegisterBenchmark(test_name, throughput, mode, device, stream, kernel,
-                                       num_element, loop_count, DataType::fp32)
+        ::benchmark::RegisterBenchmark(test_name, throughput, mode, fmt::format("mad_throughput_{}", loop_count),
+                                       num_element, loop_count, float32)
             ->UseManualTime()
             ->Unit(::benchmark::kMicrosecond)
             ->MinTime(std::numeric_limits<float>::epsilon());// use cache make calculation fast after warmup

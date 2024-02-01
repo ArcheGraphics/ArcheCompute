@@ -6,9 +6,15 @@
 
 #pragma once
 
+#include <variant>
+#include <memory>
+
 namespace vox {
-class DeviceExtension {
-public:
-    virtual ~DeviceExtension() = default;
-};
+class Array;
+
+using ArrayArgument = Array;
+
+using UniformArgument = std::vector<uint8_t>;
+
+using Argument = std::variant<ArrayArgument, UniformArgument>;
 }// namespace vox
