@@ -51,7 +51,7 @@ std::pair<MTL::Library *, NS::Error *> load_library_from_path(
 
 MTL::Library *load_library(
     MTL::Device *device,
-    const std::string &lib_name = "mlx",
+    const std::string &lib_name = "metal_kernel",
     const char *lib_path = default_mtllib_path) {
     // Firstly, search for the metallib in the same path as this binary
     std::string first_path = get_colocated_mtllib_path(lib_name);

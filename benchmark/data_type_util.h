@@ -11,7 +11,7 @@
 #include <ostream>
 #include <utility>
 
-namespace vox {
+namespace vox::benchmark {
 // Class to emulate half float on CPU.
 class fp16 {
 public:
@@ -50,4 +50,4 @@ private:
     uint16_t value_{};
 };
 
-}// namespace vox
+}// namespace vox::benchmark

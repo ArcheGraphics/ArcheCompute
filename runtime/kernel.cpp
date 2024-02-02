@@ -51,7 +51,7 @@ Kernel::Kernel(MTL::ComputePipelineState *pso) : _pso{pso} {}
 void Kernel::operator()(
     std::array<uint32_t, 3> thread_groups_per_grid,
     std::array<uint32_t, 3> threads_per_thread_group,
-    const std::initializer_list<Argument> &args,
+    const std::vector<Argument> &args,
     uint32_t stream) {
 
     static constexpr auto argument_buffer_size = 65536u;

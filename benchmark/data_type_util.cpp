@@ -9,7 +9,7 @@
 #include <cstring>
 #include <type_traits>
 
-namespace vox {
+namespace vox::benchmark {
 
 template<typename To, typename From>
 static To bitcast(From x) {
@@ -51,4 +51,4 @@ float fp16::to_float() const {
     return bitcast<float>(asInt);
 }
 
-}// namespace vox
+}// namespace vox::benchmark

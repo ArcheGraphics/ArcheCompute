@@ -12,7 +12,6 @@
 namespace vox {
 struct Dtype {
     enum class Val {
-        bool_,
         uint8,
         uint16,
         uint32,
@@ -44,8 +43,6 @@ struct Dtype {
         return val;
     };
 };
-
-static constexpr Dtype bool_{Dtype::Val::bool_, sizeof(bool)};
 
 static constexpr Dtype uint8{Dtype::Val::uint8, sizeof(uint8_t)};
 static constexpr Dtype uint16{Dtype::Val::uint16, sizeof(uint16_t)};
@@ -80,4 +77,10 @@ template<typename T>
 struct TypeToDtype {
     operator Dtype();
 };
+
+inline bool is_floating_point(const Dtype &t) {
+    return t == float32 || t == float16 ||
+           t == float2 || t == float3 || t == float4 || t == float2x2 || t == float3x3 || t == float4x4;
+}
+
 }// namespace vox

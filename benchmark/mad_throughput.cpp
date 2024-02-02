@@ -4,7 +4,7 @@
 //  personal capacity and am not conveying any rights to any intellectual
 //  property of any third parties.
 
-#include "mad_throughput.h"
+#include "benchmark_api.h"
 #include "runtime/device.h"
 #include "runtime/array.h"
 #include "runtime/kernel.h"
@@ -19,14 +19,15 @@ static void throughput(::benchmark::State &state,
                        LatencyMeasureMode mode,
                        const std::string &kernel_name,
                        int num_element, int loop_count, Dtype data_type) {
-    auto kernel = Kernel::builder().entry(kernel_name).build();
+    auto throughput = Kernel::builder().entry(kernel_name).build();
 
     //===-------------------------------------------------------------------===/
     // Create buffers
     //===-------------------------------------------------------------------===/
-    Array src0_buffer(data_type, {num_element});
-    Array src1_buffer(data_type, {num_element});
-    Array dst_buffer(data_type, {num_element});
+    std::vector<float> init(num_element, 0);
+    Array src0_buffer(init, data_type);
+    Array src1_buffer(init, data_type);
+    Array dst_buffer(init, data_type);
 
     //===-------------------------------------------------------------------===/
     // Set source buffer data
@@ -41,66 +42,49 @@ static void throughput(::benchmark::State &state,
     };
 
     if (data_type == float16) {
-        std::vector<uint16_t> src_float_buffer0(num_element);
         for (size_t i = 0; i < num_element; i++) {
-            src_float_buffer0[i] = fp16(getSrc0(i)).get_value();
+            src0_buffer.data<float16_t>(i) = fp16(getSrc0(i)).get_value();
         }
-
-        std::vector<uint16_t> src_float_buffer1(num_element);
         for (size_t i = 0; i < num_element; i++) {
-            src_float_buffer1[i] = fp16(getSrc1(i)).get_value();
+            src1_buffer.data<float16_t>(i) = fp16(getSrc1(i)).get_value();
         }
-
-        src0_buffer.copy_from(src_float_buffer0.data());
-        src1_buffer.copy_from(src_float_buffer1.data());
     } else if (data_type == float32) {
-        std::vector<float> src_float_buffer0(num_element);
         for (size_t i = 0; i < num_element; i++) {
-            src_float_buffer0[i] = getSrc0(i);
+            src0_buffer.data<float>(i) = getSrc0(i);
         }
-
-        std::vector<float> src_float_buffer1(num_element);
         for (size_t i = 0; i < num_element; i++) {
-            src_float_buffer1[i] = getSrc1(i);
+            src1_buffer.data<float>(i) = getSrc1(i);
         }
-
-        src0_buffer.copy_from(src_float_buffer0.data());
-        src1_buffer.copy_from(src_float_buffer1.data());
     }
 
     //===-------------------------------------------------------------------===/
     // Dispatch
     //===-------------------------------------------------------------------===/
-    kernel(
+    throughput(
         {(uint32_t)num_element / 4 / 32, 1, 1},
         {32, 1, 1},
         {src0_buffer, src1_buffer, dst_buffer});
+    synchronize(true);
 
     //===-------------------------------------------------------------------===/
     // Verify destination buffer data
     //===-------------------------------------------------------------------===/
 
     if (data_type == float16) {
-        std::vector<uint16_t> dst_float_buffer(num_element);
-        dst_buffer.copy_to(dst_float_buffer.data());
-
         for (size_t i = 0; i < num_element; i++) {
             float limit = getSrc1(i) * (1.f / (1.f - getSrc0(i)));
-            EXPECT_NEAR(fp16(dst_float_buffer[i]).to_float(), limit, 0.5f)
+            EXPECT_NEAR(fp16(dst_buffer.data<float16_t>(i)).to_float(), limit, 0.5f)
                 << "destination buffer element #" << i
                 << " has incorrect value: expected to be " << limit
-                << " but found " << fp16(dst_float_buffer[i]).to_float();
+                << " but found " << fp16(dst_buffer.data<float16_t>(i)).to_float();
         }
     } else if (data_type == float32) {
-        std::vector<float> dst_float_buffer(num_element);
-        dst_buffer.copy_to(dst_float_buffer.data());
-
         for (size_t i = 0; i < num_element; i++) {
             float limit = getSrc1(i) * (1.f / (1.f - getSrc0(i)));
-            EXPECT_NEAR(dst_float_buffer[i], limit, 0.01f)
+            EXPECT_NEAR(dst_buffer.data<float>(i), limit, 0.01f)
                 << "destination buffer element #" << i
                 << " has incorrect value: expected to be " << limit
-                << " but found " << dst_float_buffer[i];
+                << " but found " << dst_buffer.data<float>(i);
         }
     }
 
@@ -124,9 +108,9 @@ static void throughput(::benchmark::State &state,
             if (use_timestamp) {
                 gpu_counter->sample_counters_in_buffer(0);
             }
-            kernel({(uint32_t)num_element / 4 / 32, 1, 1},
-                   {32, 1, 1},
-                   {src0_buffer, src1_buffer, dst_buffer});
+            throughput({(uint32_t)num_element / 4 / 32, 1, 1},
+                       {32, 1, 1},
+                       {src0_buffer, src1_buffer, dst_buffer});
             if (use_timestamp) {
                 gpu_counter->sample_counters_in_buffer(1);
                 gpu_counter->update_start_times();

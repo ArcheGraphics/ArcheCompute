@@ -46,5 +46,5 @@ add_subdirectory(runtime)
 add_subdirectory(cpptests)
 add_subdirectory(benchmark)
 
-#add_subdirectory(python)
+add_subdirectory(python)
 add_subdirectory(apps)

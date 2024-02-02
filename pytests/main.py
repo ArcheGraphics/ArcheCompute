@@ -2,13 +2,8 @@ from arche_compute import *
 import numpy as np
 
 if __name__ == '__main__':
-    device = create_device(DeviceType.GPU)
-    print(device.name())
-
-    stream = device.create_stream()
-    buffer = device.create_buffer(4, 10)
-    capture = device.debug_capture()
-    capture_scope = capture.create_scope("arche-capture", DebugCaptureOption())
+    src = arc.Array(val=np.array([1, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], dtype=np.float32),
+                    dtype=arc.float32)
 
     kernelSrc = '''
     #include <metal_stdlib>
@@ -26,19 +21,14 @@ if __name__ == '__main__':
             args.buffer[0] = 10.0;
         }
     '''
-    kernel = device.create_kernel(kernelSrc, "kernel_main")
+    kernel = arc.Kernel.builder() \
+        .entry("kernel_main") \
+        .lib_name("custom_lib") \
+        .source(kernelSrc) \
+        .build()
 
-    array = np.array([1, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0], dtype=np.float32)
+    kernel.launch([1, 1, 1], [1, 1, 1], [src])
+    arc.synchronize(True)
 
-    capture_scope.start_debug_capture()
-    capture_scope.mark_begin()
-    stream.dispatch([
-        buffer.copy_from(array),
-        kernel.launch_thread_groups([1, 1, 1], [1, 1, 1], [buffer]),
-        buffer.copy_to(array)
-    ])
-    stream.synchronize()
-    capture_scope.mark_end()
-    capture_scope.stop_debug_capture()
-
-    print(array)
+    print(src.dtype)
+    print(src.tolist())

@@ -8,11 +8,6 @@
 
 namespace vox {
 template<>
-TypeToDtype<bool>::operator Dtype() {
-    return bool_;
-}
-
-template<>
 TypeToDtype<uint8_t>::operator Dtype() {
     return uint8;
 }

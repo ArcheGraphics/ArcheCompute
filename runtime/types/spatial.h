@@ -11,13 +11,19 @@
 namespace vox {
 typedef __attribute__((__ext_vector_type__(6))) float SpatialVector;
 
-typedef struct {
+struct SpatialMatrix{
     SpatialVector columns[6];
-} SpatialMatrix;
+
+    SpatialMatrix &operator=(const float &other);
+    SpatialMatrix &operator=(float &&other);
+};
 
 struct Transform {
     simd::float3 p{};
     simd::quatf q;
+
+    Transform &operator=(const float &other);
+    Transform &operator=(float &&other);
 };
 
 }// namespace vox

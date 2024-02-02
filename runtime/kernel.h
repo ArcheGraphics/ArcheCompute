@@ -14,17 +14,15 @@ namespace vox {
 class Kernel {
 public:
     class Builder;
-
     static Builder builder();
-
-    explicit Kernel(MTL::ComputePipelineState *pso);
 
     void operator()(std::array<uint32_t, 3> thread_groups_per_grid,
                     std::array<uint32_t, 3> threads_per_thread_group,
-                    const std::initializer_list<Argument> &args,
+                    const std::vector<Argument> &args,
                     uint32_t stream = 0);
 
 private:
+    explicit Kernel(MTL::ComputePipelineState *pso);
     MTL::ComputePipelineState *_pso;
 };
 

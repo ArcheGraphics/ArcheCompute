@@ -8,7 +8,7 @@
 
 #include <benchmark/benchmark.h>
 
-namespace vox {
+namespace vox::benchmark {
 enum class LatencyMeasureMode {
     // time spent from queue submit to returning from queue wait
     kSystemSubmit,
@@ -25,4 +25,14 @@ public:
     // LatencyMeasureMode::kSystemDispatch.
     virtual void register_benchmarks(LatencyMeasureMode mode) = 0;
 };
-}// namespace vox
+
+class MADThroughPut : public BenchmarkAPI {
+public:
+    void register_benchmarks(LatencyMeasureMode mode) override;
+};
+
+class Reduce : public BenchmarkAPI {
+public:
+    void register_benchmarks(LatencyMeasureMode mode) override;
+};
+}// namespace vox::benchmark

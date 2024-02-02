@@ -8,7 +8,6 @@
 #include "runtime/device.h"
 #include "runtime/array.h"
 #include "runtime/extension/debug_capture_ext.h"
-#include "common/helpers.h"
 #include "runtime/kernel.h"
 
 using namespace vox;
@@ -32,9 +31,7 @@ TEST(Metal, Base) {
             args.buffer[0] = 10.0;
         })";
 
-    std::vector<float> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    auto bytes_data = vox::to_bytes(data);
-    auto array = Array({10}, float32);
+    auto array = Array({1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f, 9.f, 10.f}, float32);
     auto kernel = Kernel::builder()
                       .entry("kernel_main")
                       .lib_name("custom_lib")
@@ -44,19 +41,17 @@ TEST(Metal, Base) {
     capture_scope.start_debug_capture();
     capture_scope.mark_begin();
     {
-        array.copy_from(bytes_data.data());
         kernel({1, 1, 1}, {1, 1, 1}, {array});
-        array.copy_to(bytes_data.data());
+        synchronize(true);
     }
     capture_scope.mark_end();
     capture_scope.stop_debug_capture();
 
-    vox::from_bytes(bytes_data, data);
     for (int i = 0; i < 10; ++i) {
         if (i == 0) {
-            EXPECT_EQ(data[i], 10);
+            EXPECT_EQ(array.data<float>(i), 10);
         } else {
-            EXPECT_EQ(data[i], i + 1);
+            EXPECT_EQ(array.data<float>(i), i + 1);
         }
     }
 }

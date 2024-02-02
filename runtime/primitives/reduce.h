@@ -6,15 +6,9 @@
 
 #pragma once
 
-#include <variant>
-#include <memory>
+#include "../array.h"
 
 namespace vox {
-class Array;
+void reduce(const Array &src, Array &dst, uint32_t stream = 0);
 
-using ArrayArgument = Array;
-
-using UniformArgument = std::vector<uint8_t>;
-
-using Argument = std::variant<std::monostate, ArrayArgument, UniformArgument>;
 }// namespace vox

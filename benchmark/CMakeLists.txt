@@ -15,6 +15,7 @@ set(SRC
         data_type_util.cpp
         main.cpp
         mad_throughput.cpp
+        reduce.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SRC})

@@ -17,9 +17,8 @@ find_package(pybind11 CONFIG REQUIRED)
 
 # Add a library using FindPython's tooling (pybind11 also provides a helper like
 # this)
-python_add_library(_core MODULE device.cpp WITH_SOABI)
-target_link_libraries(_core PRIVATE pybind11::headers common rhi)
-target_link_libraries(_core PRIVATE metal)
+python_add_library(_core MODULE device.cpp array.cpp WITH_SOABI)
+target_link_libraries(_core PRIVATE pybind11::headers common runtime metal-cpp)
 
 target_include_directories(_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ../)
 

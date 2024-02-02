@@ -5,11 +5,6 @@
 //  property of any third parties.
 
 #pragma once
-#include <algorithm>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <vector>
 
 #include "dtypes.h"
 #include "allocator.h"
@@ -20,6 +15,12 @@ public:
     /** Construct a scalar Array with zero dimensions. */
     template<typename T>
     explicit Array(T val, Dtype dtype = TypeToDtype<T>());
+
+    template<typename T>
+    explicit Array(std::vector<T> val, Dtype dtype = TypeToDtype<T>());
+
+    template<typename T, size_t N>
+    explicit Array(std::array<T, N> val, Dtype dtype = TypeToDtype<T>());
 
     template<typename It>
     Array(It data,
@@ -36,9 +37,6 @@ public:
     Array(std::initializer_list<T> data,
           const std::vector<int> &shape,
           Dtype dtype = TypeToDtype<T>());
-
-    /* Build an array from a buffer */
-    Array(Dtype dtype, const std::vector<int> &shape);
 
     /** Assignment to rvalue does not compile. */
     Array &operator=(const Array &other) && = delete;
@@ -107,32 +105,13 @@ public:
 
     struct Data {
         Buffer buffer;
-        explicit Data(Buffer buffer) : buffer(buffer){};
+        explicit Data(size_t size) : buffer(malloc(size)){};
         // Not copyable
         Data(const Data &d) = delete;
         Data &operator=(const Data &d) = delete;
         ~Data() {
             free(buffer);
         }
-    };
-
-    struct Flags {
-        // True if there are no gaps in the underlying data. Each item
-        // in the underlying data buffer belongs to at least one index.
-        bool contiguous : 1;
-
-        bool row_contiguous : 1;
-        bool col_contiguous : 1;
-    };
-
-    /** True indicates the Arrays buffer is safe to reuse */
-    [[nodiscard]] bool is_donatable() const {
-        return array_desc_.use_count() == 1 && (array_desc_->data.use_count() == 1);
-    }
-
-    /** Get the Flags bit-field. */
-    [[nodiscard]] const Flags &flags() const {
-        return array_desc_->flags;
     };
 
     Buffer &buffer() {
@@ -152,36 +131,18 @@ public:
     T *data() {
         return static_cast<T *>(array_desc_->data_ptr);
     };
-
+    template<typename T>
+    T &data(size_t index) {
+        return static_cast<T *>(array_desc_->data_ptr)[index];
+    };
     template<typename T>
     [[nodiscard]] const T *data() const {
         return static_cast<T *>(array_desc_->data_ptr);
     };
-
-    void set_data(Buffer buffer);
-
-    void set_data(Buffer buffer,
-                  size_t data_size,
-                  std::vector<size_t> strides,
-                  Flags flags);
-
-    void copy_shared_buffer(const Array &other,
-                            const std::vector<size_t> &strides,
-                            Flags flags,
-                            size_t data_size,
-                            size_t offset = 0);
-
-    void copy_shared_buffer(const Array &other);
-
-    void move_shared_buffer(const Array &other);
-
-    void overwrite_descriptor(const Array &other) {
-        array_desc_ = other.array_desc_;
-    }
-
-    void copy_to(void *data, uint32_t stream = 0) const noexcept;
-
-    void copy_from(const void *data) noexcept;
+    template<typename T>
+    [[nodiscard]] const T &data(size_t index) const {
+        return static_cast<T *>(array_desc_->data_ptr)[index];
+    };
 
 private:
     // Initialize the Arrays data
@@ -189,10 +150,10 @@ private:
     void init(It src);
 
     struct ArrayDesc {
+        Dtype dtype;
         std::vector<int> shape;
         std::vector<size_t> strides;
         size_t size{};
-        Dtype dtype;
 
         // This is a shared pointer so that *different* Arrays
         // can share the underlying data buffer.
@@ -200,9 +161,6 @@ private:
 
         // Properly offset data pointer
         void *data_ptr{nullptr};
-
-        // Contains useful meta data about the Array
-        Flags flags{};
 
         explicit ArrayDesc(const std::vector<int> &shape, Dtype dtype);
     };
@@ -218,6 +176,16 @@ template<typename T>
 Array::Array(T val, Dtype dtype /* = TypeToDtype<T>() */)
     : array_desc_(std::make_shared<ArrayDesc>(std::vector<int>{}, dtype)) {
     init(&val);
+}
+
+template<typename T>
+Array::Array(std::vector<T> val, Dtype dtype)
+    : Array(val.data(), {(int)val.size()}, dtype) {
+}
+
+template<typename T, size_t N>
+Array::Array(std::array<T, N> val, Dtype dtype)
+    : Array(val.data(), {(int)N}, dtype) {
 }
 
 template<typename It>
@@ -250,8 +218,9 @@ Array::Array(std::initializer_list<T> data,
 
 template<typename It>
 void Array::init(It src) {
-    set_data(malloc(size() * size_of(dtype())));
-    std::memcpy(array_desc_->data_ptr, src, size());
+    array_desc_->data = std::make_shared<Data>(size() * size_of(dtype()));
+    array_desc_->data_ptr = array_desc_->data->buffer.raw_ptr();
+    std::memcpy(array_desc_->data_ptr, src, nbytes());
 }
 
 }// namespace vox

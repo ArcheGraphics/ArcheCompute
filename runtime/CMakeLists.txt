@@ -8,9 +8,15 @@ cmake_minimum_required(VERSION 3.16)
 
 project(runtime LANGUAGES C CXX)
 
+set(PRIMITIVES_FILES
+        primitives/reduce.h
+        primitives/reduce.cpp
+)
+
 set(COMMON_FILES
         types/half_types.h
         types/spatial.h
+        types/spatial.cpp
         dtypes.h
         dtypes.cpp
         metal.h
@@ -28,6 +34,8 @@ set(COMMON_FILES
         kernel.cpp
         counter.h
         counter.cpp
+        utils.h
+        utils.cpp
 )
 
 set(EXTENSION_FILES
@@ -38,6 +46,7 @@ set(EXTENSION_FILES
 set(PROJECT_FILES
         ${COMMON_FILES}
         ${EXTENSION_FILES}
+        ${PRIMITIVES_FILES}
 )
 
 add_library(${PROJECT_NAME} OBJECT ${PROJECT_FILES})
@@ -72,3 +81,10 @@ add_dependencies(
 set(MLX_METAL_PATH ${CMAKE_CURRENT_BINARY_DIR}/)
 target_compile_definitions(
         ${PROJECT_NAME} PRIVATE METAL_PATH="${MLX_METAL_PATH}/metal_kernel.metallib")
+
+# python install
+install(
+        FILES ${MLX_METAL_PATH}/metal_kernel.metallib
+        DESTINATION arche_compute
+        COMPONENT metallib
+)

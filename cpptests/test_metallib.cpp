@@ -17,9 +17,10 @@ TEST(Metal, Metallib) {
     auto capture_scope = DebugCaptureExt::create_scope("arche-capture");
 
     const size_t num_element = 1024;
-    Array src0_array(float32, {num_element});
-    Array src1_array(float32, {num_element});
-    Array dst_array(float32, {num_element});
+    std::vector<float> init(num_element, 0);
+    Array src0_array(init, float32);
+    Array src1_array(init, float32);
+    Array dst_array(init, float32);
     auto getSrc0 = [](size_t i) {
         float v = float((i % 9) + 1) * 0.1f;
         return v;
@@ -29,17 +30,13 @@ TEST(Metal, Metallib) {
         return v;
     };
     {
-        std::vector<float> src_float_buffer0(num_element);
         for (size_t i = 0; i < num_element; i++) {
-            src_float_buffer0[i] = getSrc0(i);
+            src0_array.data<float>(i) = getSrc0(i);
         }
 
-        std::vector<float> src_float_buffer1(num_element);
         for (size_t i = 0; i < num_element; i++) {
-            src_float_buffer1[i] = getSrc1(i);
+            src1_array.data<float>(i) = float((i % 5) + 1) * 1.f;
         }
-        src0_array.copy_from(src_float_buffer0.data());
-        src1_array.copy_from(src_float_buffer1.data());
     }
 
     auto kernel = Kernel::builder()
@@ -52,18 +49,16 @@ TEST(Metal, Metallib) {
         kernel({(uint32_t)num_element / 4 / 32, 1, 1},
                {32, 1, 1},
                {src0_array, src1_array, dst_array});
+        synchronize(true);
     }
-    std::vector<float> dst_float_buffer(num_element);
-    dst_array.copy_to(dst_float_buffer.data());
-
     capture_scope.mark_end();
     capture_scope.stop_debug_capture();
 
     for (size_t i = 0; i < num_element; i++) {
         float limit = getSrc1(i) * (1.f / (1.f - getSrc0(i)));
-        EXPECT_NEAR(dst_float_buffer[i], limit, 0.01f)
+        EXPECT_NEAR(dst_array.data<float>(i), limit, 0.01f)
             << "destination buffer element #" << i
             << " has incorrect value: expected to be " << limit
-            << " but found " << dst_float_buffer[i];
+            << " but found " << dst_array.data<float>(i);
     }
 }
