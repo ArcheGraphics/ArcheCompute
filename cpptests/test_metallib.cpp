@@ -42,13 +42,13 @@ TEST(Metal, Metallib) {
     auto kernel = Kernel::builder()
                       .entry(fmt::format("mad_throughput_{}", 100000))
                       .build();
+    kernel.set_threads(num_element / 4);
+    kernel.set_threads_per_thread_group(32);
 
     capture_scope.start_debug_capture();
     capture_scope.mark_begin();
     {
-        kernel({(uint32_t)num_element / 4 / 32, 1, 1},
-               {32, 1, 1},
-               {src0_array, src1_array, dst_array});
+        kernel({src0_array, src1_array, dst_array});
         synchronize(true);
     }
     capture_scope.mark_end();

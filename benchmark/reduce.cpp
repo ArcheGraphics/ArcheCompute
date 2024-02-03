@@ -47,7 +47,7 @@ static void reduce(::benchmark::State &state,
     //===-------------------------------------------------------------------===/
     // Dispatch
     //===-------------------------------------------------------------------===/
-    reduce({num_element, 1, 1}, {1, 1, 1}, {src_buffer, dst_buffer});
+    reduce({src_buffer, dst_buffer});
     synchronize(true);
 
     //===-------------------------------------------------------------------===/
@@ -72,9 +72,7 @@ static void reduce(::benchmark::State &state,
 
         capture_scope.start_debug_capture();
         capture_scope.mark_begin();
-        reduce({(uint32_t)num_element / 4 / 32, 1, 1},
-               {32, 1, 1},
-               {src_buffer, dst_buffer});
+        reduce({src_buffer, dst_buffer});
         synchronize();
         capture_scope.mark_end();
         capture_scope.stop_debug_capture();

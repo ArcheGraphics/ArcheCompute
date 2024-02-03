@@ -37,8 +37,12 @@ struct PrintFormatter {
     static bool capitalize_bool;
 };
 
+std::string type_to_name(const Dtype &d);
+
 std::ostream &operator<<(std::ostream &os, const Dtype &d);
 std::ostream &operator<<(std::ostream &os, const std::vector<int> &v);
 std::ostream &operator<<(std::ostream &os, const std::vector<size_t> &v);
+
+MTL::Size get_block_dims(int dim0, int dim1, int dim2);
 
 }// namespace vox

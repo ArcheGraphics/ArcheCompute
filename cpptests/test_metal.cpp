@@ -37,11 +37,13 @@ TEST(Metal, Base) {
                       .lib_name("custom_lib")
                       .source(kernelSrc)
                       .build();
+    kernel.set_thread_groups(1);
+    kernel.set_threads_per_thread_group(1);
 
     capture_scope.start_debug_capture();
     capture_scope.mark_begin();
     {
-        kernel({1, 1, 1}, {1, 1, 1}, {array});
+        kernel({array});
         synchronize(true);
     }
     capture_scope.mark_end();

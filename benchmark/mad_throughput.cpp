@@ -20,6 +20,8 @@ static void throughput(::benchmark::State &state,
                        const std::string &kernel_name,
                        int num_element, int loop_count, Dtype data_type) {
     auto throughput = Kernel::builder().entry(kernel_name).build();
+    throughput.set_threads(num_element / 4);
+    throughput.set_threads_per_thread_group(32);
 
     //===-------------------------------------------------------------------===/
     // Create buffers
@@ -60,10 +62,7 @@ static void throughput(::benchmark::State &state,
     //===-------------------------------------------------------------------===/
     // Dispatch
     //===-------------------------------------------------------------------===/
-    throughput(
-        {(uint32_t)num_element / 4 / 32, 1, 1},
-        {32, 1, 1},
-        {src0_buffer, src1_buffer, dst_buffer});
+    throughput({src0_buffer, src1_buffer, dst_buffer});
     synchronize(true);
 
     //===-------------------------------------------------------------------===/
@@ -108,9 +107,7 @@ static void throughput(::benchmark::State &state,
             if (use_timestamp) {
                 gpu_counter->sample_counters_in_buffer(0);
             }
-            throughput({(uint32_t)num_element / 4 / 32, 1, 1},
-                       {32, 1, 1},
-                       {src0_buffer, src1_buffer, dst_buffer});
+            throughput({src0_buffer, src1_buffer, dst_buffer});
             if (use_timestamp) {
                 gpu_counter->sample_counters_in_buffer(1);
                 gpu_counter->update_start_times();

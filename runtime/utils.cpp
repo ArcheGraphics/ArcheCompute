@@ -94,50 +94,75 @@ inline void PrintFormatter::print(std::ostream &os, SpatialMatrix val) {
     }
 }
 
-std::ostream &operator<<(std::ostream &os, const Dtype &dtype) {
-    switch (dtype) {
+std::string type_to_name(const Dtype &d) {
+    std::string tname;
+    switch (d) {
         case uint8:
-            return os << "uint8";
+            tname = "uint8";
+            break;
         case uint16:
-            return os << "uint16";
+            tname = "uint16";
+            break;
         case uint32:
-            return os << "uint32";
+            tname = "uint32";
+            break;
         case uint64:
-            return os << "uint64";
+            tname = "uint64";
+            break;
         case int8:
-            return os << "int8";
+            tname = "int8";
+            break;
         case int16:
-            return os << "int16";
+            tname = "int16";
+            break;
         case int32:
-            return os << "int32";
+            tname = "int32";
+            break;
         case int64:
-            return os << "int64";
+            tname = "int64";
+            break;
         case float16:
-            return os << "float16";
+            tname = "float16";
+            break;
         case float32:
-            return os << "float32";
+            tname = "float32";
+            break;
         case quat:
-            return os << "quat";
+            tname = "quat";
+            break;
         case float2:
-            return os << "float2";
+            tname = "float2";
+            break;
         case float3:
-            return os << "float3";
+            tname = "float3";
+            break;
         case float4:
-            return os << "float4";
+            tname = "float4";
+            break;
         case float2x2:
-            return os << "float2x2";
+            tname = "float2x2";
+            break;
         case float3x3:
-            return os << "float3x3";
+            tname = "float3x3";
+            break;
         case float4x4:
-            return os << "float4x4";
+            tname = "float4x4";
+            break;
         case transform:
-            return os << "transform";
+            tname = "transform";
+            break;
         case spatial_vector:
-            return os << "spatial_vector";
+            tname = "spatial_vector";
+            break;
         case spatial_matrix:
-            return os << "spatial_matrix";
+            tname = "spatial_matrix";
+            break;
     }
-    return os;
+    return tname;
+}
+
+std::ostream &operator<<(std::ostream &os, const Dtype &dtype) {
+    return os << type_to_name(dtype);
 }
 
 std::ostream &operator<<(std::ostream &os, const std::vector<int> &v) {
@@ -156,6 +181,37 @@ std::ostream &operator<<(std::ostream &os, const std::vector<size_t> &v) {
     }
     os << ")";
     return os;
+}
+
+MTL::Size get_block_dims(int dim0, int dim1, int dim2) {
+    int pows[3] = {0, 0, 0};
+    int sum = 0;
+    while (true) {
+        int presum = sum;
+        // Check all the pows
+        if (dim0 >= (1 << (pows[0] + 1))) {
+            pows[0]++;
+            sum++;
+        }
+        if (sum == 10) {
+            break;
+        }
+        if (dim1 >= (1 << (pows[1] + 1))) {
+            pows[1]++;
+            sum++;
+        }
+        if (sum == 10) {
+            break;
+        }
+        if (dim2 >= (1 << (pows[2] + 1))) {
+            pows[2]++;
+            sum++;
+        }
+        if (sum == presum || sum == 10) {
+            break;
+        }
+    }
+    return MTL::Size{1ul << pows[0], 1ul << pows[1], 1ul << pows[2]};
 }
 
 }// namespace vox

@@ -9,6 +9,8 @@
 #include "../array.h"
 
 namespace vox {
-void reduce(const Array &src, Array &dst, uint32_t stream = 0);
+enum class ReduceType { And, Or, Sum, Prod, Min, Max };
+
+void reduce(const Array &src, Array &dst, ReduceType reduce_type, uint32_t stream = 0);
 
 }// namespace vox
